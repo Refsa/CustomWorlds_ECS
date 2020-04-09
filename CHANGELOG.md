@@ -13,3 +13,5 @@ Notable changes to the project will be documented here
 
 ### Added
 - Added compiler define flag to enable example (ENABLE_CUSTOM_WORLDS_ECS_EXAMPLE)
+- Added asmdefs for empty folders
+- Added base for documentation folder
