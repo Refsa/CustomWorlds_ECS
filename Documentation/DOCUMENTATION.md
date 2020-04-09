@@ -5,21 +5,21 @@ The use of this package should be as smooth as possible. As such the core stuff 
 will handle all the default setup of worlds, but also allows the user to further extend how worlds are setup.
 
 ## Auto Setup
-To help with creating all the required types for using the custom worlds framework there exists a context
+To help with creating all the **required** types for using the custom worlds framework there exists a context
 menu item on "Assets/Create/Custom World". Under this menu there is a Setup item and a New Custom World item.
 
 ### Setup - Context Menu Item
-Setup will create the core components required to use the framework:
+Setup will create the core components **required** to use the framework:
 
 #### CustomBootstrapBase class
-It will create a class deriving from CustomBootstrapBase in order to override the internal world creation from Unity.
+It will create a class deriving from __CustomBootstrapBase__ in order to override the internal world creation from Unity.
 
 #### CustomWorldType enum
-It will create a new enum with the name CustomWorldType that you can populate with the custom worlds you want to 
+It will create a new __enum__ with the name __CustomWorldType__ that you can populate with the custom worlds you want to 
 implement.
 
 #### CustomWorldTypeAttribute Attribute
-It will create the appropriate attribute in order to mark Systems and SystemGroups to be spawned in a Custom World.
+It will create the appropriate __attribute__ in order to mark Systems and SystemGroups to be spawned in a Custom World.
 
 ### New Custom World - Context Menu Item
 New Custom World will create a new class deriving from the CustomWorldBase class. To make use of this functionality
@@ -34,7 +34,7 @@ deriving from this interface exists Unity will only use the first one that retur
 ## How To
 
 ### World Type Enum
-You need to setup an enum you will use to tag your systems and worlds with.
+**You need to setup an enum** you will use to tag your systems and worlds with.
 
 Example Enum:
 ```csharp
@@ -47,7 +47,7 @@ public enum CustomWorldType
 ```
 
 ### ICustomWorldTypeAttribute
-You will need to create an attribute class that derives from this interface. This will be used later on
+**You will need to create an attribute class** that derives from this interface. This will be used later on
 so you can tag your systems and worlds with an Enum that identifies it.
 
 Attribute Setup Example:
@@ -67,7 +67,7 @@ public class CustomWorldTypeAttribute : Attribute, ICustomWorldTypeAttribute<Cus
 ```
 
 ### CustomBootstrapBase
-In order to override the internal Unity you need to create a class that derives from this base class.
+**In order to override the internal Unity you need to create a class that derives from this base class.**
 It needs two generic parameters, one which is the World Type enum and the other an Attribute.
 
 This class contains everything it needs to automatically do the setup for you, but exists to allow
@@ -83,7 +83,7 @@ public class CustomWorldBootstrapExample : CustomBootstrapBase<CustomWorldType, 
 
 ### CustomWorldBootstrapBase
 To allow you to create more worlds the package contains an ICustomWorldBootstrap interface. CustomBootstrapBase will look
-for classes deriving from this in order to create additional worlds. 
+for classes deriving from this in order to create additional worlds.
 
 To make the process easier a CustomWorldBootstrapBase exists that contains additional helpers to automatically find
 and add tagged systems. It also contains helpers to add the internal Unity systems required (Initialize, Update and Presentation).
