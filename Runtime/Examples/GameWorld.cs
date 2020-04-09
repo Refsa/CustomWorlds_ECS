@@ -7,13 +7,7 @@ namespace Refsa.CustomWorld.Examples
     {
         public override World Initialize()
         {
-            var world = new World(GetType().Name);
-            
-            var worldSystems = GetAllSystems(CustomWorldType.Game);
-
-            DefaultWorldInitialization.AddSystemsToRootLevelSystemGroups(world, worldSystems);
-
-            return world;
+            return SetupDefaultWorldType(GetType().Name, CustomWorldType.Game);
         }
     }
 }

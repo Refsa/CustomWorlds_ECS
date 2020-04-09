@@ -158,5 +158,87 @@ namespace Refsa.CustomWorld
             return types;
             #endif
         }
+
+        public static ComponentSystemBase GetOrCreateManagerAndLogException(World world, Type type)
+        {
+            try
+            {
+                return world.GetOrCreateSystem(type);
+            }
+            catch (Exception e)
+            {
+                Debug.LogException(e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Adds the collection of systems to the world by injecting them into the root level system groups
+        /// (InitializationSystemGroup, SimulationSystemGroup and PresentationSystemGroup)
+        /// </summary>
+        public static void AddSystemsToRootLevelSystemGroups(World world, IEnumerable<Type> systems)
+        {
+            // create presentation system and simulation system
+            var initializationSystemGroup = world.GetOrCreateSystem<InitializationSystemGroup>();
+            var simulationSystemGroup = world.GetOrCreateSystem<SimulationSystemGroup>();
+            var presentationSystemGroup = world.GetOrCreateSystem<PresentationSystemGroup>();
+
+            // Add systems to their groups, based on the [UpdateInGroup] attribute.
+            foreach (var type in systems)
+            {
+                // Skip the built-in root-level system groups
+                if (type == typeof(InitializationSystemGroup) ||
+                    type == typeof(SimulationSystemGroup) ||
+                    type == typeof(PresentationSystemGroup))
+                {
+                    continue;
+                }
+
+                var groups = type.GetCustomAttributes(typeof(UpdateInGroupAttribute), true);
+                if (groups.Length == 0)
+                {
+                    simulationSystemGroup.AddSystemToUpdateList(GetOrCreateManagerAndLogException(world, type));
+                }
+
+                foreach (var g in groups)
+                {
+                    var group = g as UpdateInGroupAttribute;
+                    if (group == null)
+                        continue;
+
+                    if (!(typeof(ComponentSystemGroup)).IsAssignableFrom(group.GroupType))
+                    {
+                        Debug.LogError($"Invalid [UpdateInGroup] attribute for {type}: {group.GroupType} must be derived from ComponentSystemGroup.");
+                        continue;
+                    }
+
+                    // Warn against unexpected behaviour combining DisableAutoCreation and UpdateInGroup
+                    var parentDisableAutoCreation = group.GroupType.GetCustomAttribute<DisableAutoCreationAttribute>() != null;
+                    if (parentDisableAutoCreation)
+                    {
+                        Debug.LogWarning($"A system {type} wants to execute in {group.GroupType} but this group has [DisableAutoCreation] and {type} does not.");
+                    }
+
+                    var groupMgr = GetOrCreateManagerAndLogException(world, group.GroupType);
+                    if (groupMgr == null)
+                    {
+                        Debug.LogWarning(
+                            $"Skipping creation of {type} due to errors creating the group {group.GroupType}. Fix these errors before continuing.");
+                        continue;
+                    }
+
+                    var groupSys = groupMgr as ComponentSystemGroup;
+                    if (groupSys != null)
+                    {
+                        groupSys.AddSystemToUpdateList(GetOrCreateManagerAndLogException(world, type));
+                    }
+                }
+            }
+
+            // Update player loop
+            initializationSystemGroup.SortSystemUpdateList();
+            simulationSystemGroup.SortSystemUpdateList();
+            presentationSystemGroup.SortSystemUpdateList();
+        }
     }
 }
