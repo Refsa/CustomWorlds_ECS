@@ -15,3 +15,5 @@ Notable changes to the project will be documented here
 - Added compiler define flag to enable example (ENABLE_CUSTOM_WORLDS_ECS_EXAMPLE)
 - Added asmdefs for empty folders
 - Added base for documentation folder
+- Changed access modifier on CustomBootstrapBase::CreateCustomBootstrap to protected
+- Changed name of CustomBootstrapBase::CreateCustomBootstrap to CreateCustomWorlds
