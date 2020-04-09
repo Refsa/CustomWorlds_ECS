@@ -1,0 +1,11 @@
+using Unity.Entities;
+using Refsa.CustomWorld;
+
+[CustomWorldType(CustomWorldType.#WORLDTYPE#)]
+public class #WORLDTYPE#World : CustomWorldBootstrapBase<CustomWorldType, CustomWorldTypeAttribute>
+{
+    public override World Initialize()
+    {
+        return SetupDefaultWorldType(GetType().Name, CustomWorldType.#WORLDTYPE#);
+    }
+}

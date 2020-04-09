@@ -1,3 +1,16 @@
-﻿{
-	"name": "Refsa.CustomWorld.Editor"
+{
+    "name": "Refsa.CustomWorld.Editor",
+    "references": [
+        "GUID:4eb94ae255c0a6f4caf53cf3aef62c42",
+        "GUID:734d92eba21c94caba915361bd5ac177"
+    ],
+    "includePlatforms": [],
+    "excludePlatforms": [],
+    "allowUnsafeCode": false,
+    "overrideReferences": false,
+    "precompiledReferences": [],
+    "autoReferenced": true,
+    "defineConstraints": [],
+    "versionDefines": [],
+    "noEngineReferences": false
 }

@@ -1,0 +1,6 @@
+using Refsa.CustomWorld;
+
+public class CustomWorldBootstrap : CustomBootstrapBase<CustomWorldType, CustomWorldTypeAttribute>
+{
+    
+}

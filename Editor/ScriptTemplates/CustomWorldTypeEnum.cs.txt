@@ -1,0 +1,4 @@
+public enum CustomWorldType
+{
+    Default = 0
+}
