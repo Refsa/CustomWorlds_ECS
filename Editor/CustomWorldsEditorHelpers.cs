@@ -13,9 +13,10 @@ namespace Refsa.CustomWorld.Editor
 {
     public static class CustomWorldsEditorHelpers
     {
-        const int ContextMenuPriority = -1000;
+        const int ContextMenuSorting = 50;
 
-        [MenuItem("Assets/Create/Custom World/Setup", false, ContextMenuPriority)]
+        [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
+        [MenuItem("Assets/Create/Custom World/Setup", false, ContextMenuSorting)]
         public static void SetupCustomWorldBootstrap()
         {
             if (IsBaseSetup(out Type current))
@@ -26,15 +27,16 @@ namespace Refsa.CustomWorld.Editor
 
             string path = GetProjectDirectoryPath();
             string currentPath = GetDirectoryPath();
-            
-            using (var enumTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeEnum.cs.txt"))
-            {
-                string enumFileContents = enumTemplate.ReadToEnd();
-                using (var enumFile = File.CreateText(path + "/CustomWorldType.cs"))
+
+            if (!ClassAlreadyExists("CustomWorldType"))
+                using (var enumTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeEnum.cs.txt"))
                 {
-                    enumFile.Write(enumFileContents);
+                    string enumFileContents = enumTemplate.ReadToEnd();
+                    using (var enumFile = File.CreateText(path + "/CustomWorldType.cs"))
+                    {
+                        enumFile.Write(enumFileContents);
+                    }
                 }
-            }
 
             if (!ClassAlreadyExists("CustomWorldTypeAttribute"))
                 using (var attributeTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeAttribute.cs.txt"))
@@ -46,7 +48,7 @@ namespace Refsa.CustomWorld.Editor
                     }
                 }
 
-            if (!ClassAlreadyExists("CustomWorldType"))
+            if (!ClassAlreadyExists("CustomBootstrap"))
                 using (var bootstrapTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomBootstrap.cs.txt"))
                 {
                     string enumFileContents = bootstrapTemplate.ReadToEnd();
@@ -59,7 +61,7 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
-        [MenuItem("Assets/Create/Custom World/New Custom World", false, ContextMenuPriority)]
+        [MenuItem("Assets/Create/Custom World/New Custom World", false, ContextMenuSorting + 11)]
         public static void CreateNewCustomWorld()
         {
             if (!IsBaseSetup(out Type current))

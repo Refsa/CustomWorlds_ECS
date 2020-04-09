@@ -9,6 +9,15 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 
 ### Changed
 
+## 1.0.1
+### Fixed
+- Fixed Setup menu item to look for already existing enum and attribute to avoid overriding 
+user created content in World Type enum
+
+### Changes
+- Changed sorting order of Custom World context menu items in Assets/Create/ to be between
+Assets/Create/Folder and Assets/Create/C# Script
+
 ## 1.0.0
 ### Fixed
 - File setup for base bootstrap didn't return if bootstrap classes already exist
