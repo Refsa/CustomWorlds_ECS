@@ -17,6 +17,7 @@ user created content in World Type enum
 ### Changes
 - Changed sorting order of Custom World context menu items in Assets/Create/ to be between
 Assets/Create/Folder and Assets/Create/C# Script
+- Updates to DOCUMENTATION.md showing how to use the framework.
 
 ## 1.0.0
 ### Fixed
