@@ -103,11 +103,17 @@ namespace Refsa.CustomWorld
 
             if (hasCustomWorldType)
             {
-                var customWorldAttribute = Attribute.GetCustomAttribute(type, typeof(A)) as ICustomWorldTypeAttribute<T>;
-                if (!customWorldAttribute.GetCustomWorldType.Equals(customWorldType))
+                bool hasAttributeWithWorldType = false;
+                foreach (var attribute in (ICustomWorldTypeAttribute<T>[]) Attribute.GetCustomAttributes(type, typeof(A)))
                 {
-                    return false;
+                    if (attribute.GetCustomWorldType.Equals(customWorldType))
+                    {
+                        hasAttributeWithWorldType = true;
+                        break;
+                    }
                 }
+
+                if (!hasAttributeWithWorldType) return false;
             }
 
             var systemFlags = WorldSystemFilterFlags.Default;

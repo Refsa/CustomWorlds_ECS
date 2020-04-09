@@ -4,7 +4,7 @@ using Unity.Entities;
 namespace Refsa.CustomWorld.Examples
 {
     [CustomWorldType(CustomWorldType.MainMenu)]
-    public class MainMenuWorld : CustomWorldBootstrapBase<CustomWorldType, CustomWorldTypeAttribute>
+    public class MainMenuWorld : CustomWorldBase<CustomWorldType, CustomWorldTypeAttribute>
     {
         public override World Initialize()
         {

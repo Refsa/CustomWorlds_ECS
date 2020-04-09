@@ -3,7 +3,7 @@ using Unity.Entities;
 namespace Refsa.CustomWorld.Examples
 {
     [CustomWorldType(CustomWorldType.Game)]
-    public class GameWorld : CustomWorldBootstrapBase<CustomWorldType, CustomWorldTypeAttribute>
+    public class GameWorld : CustomWorldBase<CustomWorldType, CustomWorldTypeAttribute>
     {
         public override World Initialize()
         {

@@ -1,11 +1,23 @@
 # Change Log
 Notable changes to the project will be documented here
 
+Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
+
 ## [Unreleased]
 ### Added
-- Marketing banner to prompt users to upgrade to a free account
+- 
 
 ### Changed
+
+## 1.0.0
+### Fixed
+- File setup for base bootstrap didn't return if bootstrap classes already exist
+
+### Changes
+- Added support for multiple World Type Attributes on systems and system groups to allow automatically creating
+them in multiple worlds.
+- Changed name of CustomWorldBootstrapBase to CustomWorldBase
+- Changed name of ICustomWorldBootstrap to ICustomWorld
 
 ## 0.0.6
 ### Added

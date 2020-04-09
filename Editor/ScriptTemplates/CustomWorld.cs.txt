@@ -2,7 +2,7 @@ using Unity.Entities;
 using Refsa.CustomWorld;
 
 [CustomWorldType(CustomWorldType.#WORLDTYPE#)]
-public class #WORLDTYPE#World : CustomWorldBootstrapBase<CustomWorldType, CustomWorldTypeAttribute>
+public class #WORLDTYPE#World : CustomWorldBase<CustomWorldType, CustomWorldTypeAttribute>
 {
     public override World Initialize()
     {

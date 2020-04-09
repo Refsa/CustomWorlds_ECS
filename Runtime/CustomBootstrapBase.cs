@@ -64,7 +64,7 @@ namespace Refsa.CustomWorld
         /// </summary>
         protected static void CreateCustomWorlds()
         {
-            var bootstrapTypes = CustomWorldHelpers.GetTypesDerivedFrom(typeof(ICustomWorldBootstrap));
+            var bootstrapTypes = CustomWorldHelpers.GetTypesDerivedFrom(typeof(ICustomWorld));
             List<Type> selectedTypes = new List<Type>();
 
             foreach (var bootType in bootstrapTypes)
@@ -77,7 +77,7 @@ namespace Refsa.CustomWorld
 
             selectedTypes
                 .Distinct()
-                .Select(e => Activator.CreateInstance(e) as ICustomWorldBootstrap)
+                .Select(e => Activator.CreateInstance(e) as ICustomWorld)
                 .ToList()
                 .ForEach(
                     e => ScriptBehaviourUpdateOrder.UpdatePlayerLoop(e.Initialize(), ScriptBehaviourUpdateOrder.CurrentPlayerLoop)

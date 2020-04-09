@@ -3,7 +3,7 @@ using UnityEngine.LowLevel;
 
 namespace Refsa.CustomWorld
 {
-    public interface ICustomWorldBootstrap
+    public interface ICustomWorld
     {
         World Initialize();
     }

@@ -15,7 +15,7 @@ namespace Refsa.CustomWorld
     /// </summary>
     /// <typeparam name="T">Enum of the World Type Tag to construct from</typeparam>
     /// <typeparam name="A">Attribute that is used on systems that this setup will use</typeparam>
-    public abstract class CustomWorldBootstrapBase<T, A> : ICustomWorldBootstrap where T : Enum where A : Attribute, ICustomWorldTypeAttribute<T>
+    public abstract class CustomWorldBase<T, A> : ICustomWorld where T : Enum where A : Attribute, ICustomWorldTypeAttribute<T>
     {
         public abstract World Initialize();
 
