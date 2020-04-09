@@ -1,6 +1,10 @@
 # Change Log
 Notable changes to the project will be documented here
 
+## [Unreleased]
+### Added
+- Marketing banner to prompt users to upgrade to a free account
+
 ### Changed
 
 ## 2020-09-04
