@@ -26,7 +26,7 @@ namespace Refsa.CustomWorld
         {
             CreateDefaultWorld(defaultWorldName);
 
-            CreateCustomWorldBootStrap();
+            CreateCustomWorlds();
 
             return true;
         }
@@ -62,7 +62,7 @@ namespace Refsa.CustomWorld
         /// 
         /// They need the A attribute in order to be considered for initialization.
         /// </summary>
-        static void CreateCustomWorldBootStrap()
+        protected static void CreateCustomWorlds()
         {
             var bootstrapTypes = CustomWorldHelpers.GetTypesDerivedFrom(typeof(ICustomWorldBootstrap));
             List<Type> selectedTypes = new List<Type>();
