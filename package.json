@@ -1,5 +1,5 @@
 {
-    "name": "refsa.github.customworld",
+    "name": "com.refsa.customworld",
     "version": "0.0.2",
     "displayName": "ECS Custom Worlds",
     "description": "Create and setup custom worlds for the Unity ECS framework",
