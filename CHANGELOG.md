@@ -7,8 +7,6 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
-### Changed
-
 ## 1.0.1
 ### Fixed
 - Fixed Setup menu item to look for already existing enum and attribute to avoid overriding 
@@ -18,6 +16,9 @@ user created content in World Type enum
 - Changed sorting order of Custom World context menu items in Assets/Create/ to be between
 Assets/Create/Folder and Assets/Create/C# Script
 - Updates to DOCUMENTATION.md showing how to use the framework.
+
+### Additions
+- Added better selector for auto-generating new worlds
 
 ## 1.0.0
 ### Fixed

@@ -70,55 +70,10 @@ namespace Refsa.CustomWorld.Editor
                 return;
             }
 
-            string path = GetProjectDirectoryPath();
-            string templatePath = GetDirectoryPath() + "/ScriptTemplates/CustomWorld.cs.txt";
-            string newWorldContents = "";
-
-            using (var newWorldTemplate = File.OpenText(templatePath))
-            {
-                newWorldContents = newWorldTemplate.ReadToEnd();
-            }
-            if (newWorldContents == "")
-            {
-                UnityEngine.Debug.LogWarning($"Template file for new Custom Worlds not found");
-            }
-
-            // setup WorldType selector
-            GenericMenu worldTypeSelector = new GenericMenu();
-            string wantedWorldType = "";
-            foreach (string name in System.Enum.GetNames(current.BaseType.GetGenericArguments()[0]))
-            {
-                worldTypeSelector.AddItem(new GUIContent(name), false,
-                    (o) => {
-                        wantedWorldType = (string)o;
-                        if (wantedWorldType != "")
-                        {
-                            string className = $"{wantedWorldType}World";
-                            if (ClassAlreadyExists(className))
-                            {
-                                UnityEngine.Debug.LogError($"Class with name [{className}] already exists");
-                                return;
-                            }
-
-                            string savePath = path + $"/{className}.cs";
-                            newWorldContents = newWorldContents.Replace("#WORLDTYPE#", wantedWorldType);
-
-                            using (var newWorldFile = File.CreateText(savePath))
-                            {
-                                newWorldFile.Write(newWorldContents);
-                            }
-
-                            AssetDatabase.Refresh();
-                        }
-                    }, name);
-            }
-
-            // Display WorldType selector
-            Rect rect = new Rect(Vector2.zero, new Vector2(100, 200));
-            worldTypeSelector.DropDown(rect);
+            NewWorldWindow.Create(current);
         }
 
-        static IReadOnlyList<string> GetUnassignedWorldTypes(Type current)
+        internal static IReadOnlyList<string> GetUnassignedWorldTypes(Type current)
         {
             Type attributeType = current.BaseType.GetGenericArguments()[1];
             Type enumType = current.BaseType.GetGenericArguments()[0];
@@ -139,7 +94,7 @@ namespace Refsa.CustomWorld.Editor
             return enumNames;
         }
 
-        static bool ClassAlreadyExists(string name)
+        internal static bool ClassAlreadyExists(string name)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -151,7 +106,7 @@ namespace Refsa.CustomWorld.Editor
             return false;
         }
 
-        static bool IsBaseSetup(out Type current)
+        internal static bool IsBaseSetup(out Type current)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
             {
@@ -169,7 +124,7 @@ namespace Refsa.CustomWorld.Editor
             return false;
         }
 
-        static string GetProjectDirectoryPath()
+        internal static string GetProjectDirectoryPath()
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
             if (Path.HasExtension(path))
@@ -179,7 +134,7 @@ namespace Refsa.CustomWorld.Editor
             return path;
         }
 
-        static string GetDirectoryPath()
+        internal static string GetDirectoryPath()
         {
             string currentPath = Directory.GetCurrentDirectory().Replace("/Assets", "") + "/Library/PackageCache/";
             bool foundPackagePath = false;
