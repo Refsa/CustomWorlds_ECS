@@ -6,8 +6,15 @@ using UnityEditor;
 using UnityEngine;
 
 namespace Refsa.CustomWorld.Editor
-{
-    internal struct CustomWorldWindowData
+{   
+    internal struct WorldTypeData
+    {
+        public string name;
+        public bool classExists;
+        public string className;
+    }
+
+    internal class CustomWorldWindowData
     {
         public string wantedWorldType;
         public string addNewWorldTypeEnum;
@@ -16,30 +23,28 @@ namespace Refsa.CustomWorld.Editor
         public string projectPath;
         public string packagePath;
         public Type bootstrapType;
+
+        public List<WorldTypeData> worldTypeData;
     }
 
     internal class CustomWorldWindow : ModalWindow<CustomWorldWindowData>
     {
+        int index = -1;
+        bool isBaseSetup = false;
+
+#region SETUP
         public static CustomWorldWindow Create()
         {
-            var window = CustomWorldWindow.CreateInstance<CustomWorldWindow>();
 
-            window.titleContent = new GUIContent("Custom World Editor");
-            window.data = new CustomWorldWindowData();
+            var window = CustomWorldWindow.CreateInstance<CustomWorldWindow>();
             window.minSize = new Vector2(400, 150);
             window.maxSize = new Vector2(400, 150);
+            window.titleContent = new GUIContent("Custom World Editor");
 
             window.showOKButton = false;
             window.cancelText = "Close";
-            window.isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out window.data.bootstrapType);
 
-            window.data.projectPath = CustomWorldsEditorHelpers.GetProjectDirectoryPath();
-            window.data.packagePath = CustomWorldsEditorHelpers.GetPackageDirectoryPath();
-
-            window.SetupNewWorldTemplatePath();
-
-            if (window.isBaseSetup)
-                window.FindAvailableWorldTypes(window.data.bootstrapType);
+            window.SetupData();
 
             window.Show();
             return window;
@@ -55,50 +60,95 @@ namespace Refsa.CustomWorld.Editor
             requestClose = true;
         }
 
-        int index = -1;
-        bool isBaseSetup = false;
+        void SetupData()
+        {
+            data = new CustomWorldWindowData();
+            
+            OnSelectionChanged();
+            SetupNewWorldTemplatePath();
+
+            isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out data.bootstrapType);
+            if (isBaseSetup)
+            {
+                SetupWorldTypeData();
+                FindAvailableWorldTypes(data.bootstrapType);
+            }
+        }
+
+        void SetupWorldTypeData()
+        {
+            data.worldTypeData = new List<WorldTypeData>();
+
+            foreach (string name in System.Enum.GetNames(data.bootstrapType.BaseType.GetGenericArguments()[0]))
+            {   
+                bool exists = CustomWorldsEditorHelpers.ClassAlreadyExists(name + "World");
+
+                data.worldTypeData.Add(
+                    new WorldTypeData {
+                        name = name,
+                        classExists = exists,
+                        className = name + "Class"
+                    }
+                );
+            }
+        }
+#endregion
+
+#region DRAW
         protected override void Draw()
         {
             if (!isBaseSetup)
             {
-                EditorGUILayout.BeginVertical();
-
-                if (GUILayout.Button("Setup Bootstrap"))
-                {
-                    data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
-                }
-                EditorGUILayout.EndVertical();
+                DrawSetupBootstrap();
             }
             else
             {
-                EditorGUILayout.BeginVertical();
-
-                if (data.availableWorldTypes != null && data.availableWorldTypes.Count != 0)
-                {
-                    index = EditorGUILayout.Popup(index, data.availableWorldTypes.ToArray());
-
-                    if (index != -1)
-                    {
-                        data.wantedWorldType = data.availableWorldTypes[index];
-                    }
-
-                    if (GUILayout.Button("Add World"))
-                    {
-                        AddNewWorld();
-                    }
-                }
-                else
-                {
-                    data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type Enum Entry", data.addNewWorldTypeEnum);
-                    if (GUILayout.Button("Add World Type Enum"))
-                    {
-                        AddNewEnumEntry();
-                    }
-                }
-                EditorGUILayout.EndVertical();
+                DrawAddWorlds();
             }
         }
 
+        void DrawSetupBootstrap()
+        {
+            EditorGUILayout.BeginVertical();
+
+            if (GUILayout.Button("Setup Bootstrap"))
+            {
+                data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
+            }
+            EditorGUILayout.EndVertical();
+        }
+
+        void DrawAddWorlds()
+        {
+            EditorGUILayout.BeginVertical();
+
+            if (data.availableWorldTypes != null && data.availableWorldTypes.Count != 0)
+            {
+                index = EditorGUILayout.Popup(index, data.availableWorldTypes.ToArray());
+
+                if (index != -1)
+                {
+                    data.wantedWorldType = data.availableWorldTypes[index];
+                }
+
+                if (GUILayout.Button("Add World"))
+                {
+                    AddNewWorld();
+                }
+            }
+            else
+            {
+                data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type Enum Entry", data.addNewWorldTypeEnum);
+                if (GUILayout.Button("Add World Type Enum"))
+                {
+                    AddNewEnumEntry();
+                }
+            }
+            EditorGUILayout.EndVertical();
+        }
+#endregion
+
+#region SCRIPT_RELOAD
         [UnityEditor.Callbacks.DidReloadScripts]
         static void OnScriptsReloaded()
         {
@@ -114,8 +164,34 @@ namespace Refsa.CustomWorld.Editor
 
         void ScriptsReloaded()
         {
+            data = new CustomWorldWindowData();
+            data.packagePath = EditorPrefs.GetString("packagePath");
+            data.projectPath = EditorPrefs.GetString("projectPath");
+
             isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out data.bootstrapType);
-            FindAvailableWorldTypes(data.bootstrapType);
+
+            SetupNewWorldTemplatePath();
+
+            Selection.selectionChanged -= OnSelectionChanged;
+            Selection.selectionChanged += OnSelectionChanged;
+
+            if (isBaseSetup)
+            {
+                FindAvailableWorldTypes(data.bootstrapType);
+                SetupWorldTypeData();
+            }
+        }
+#endregion
+
+        void OnSelectionChanged()
+        {
+            data.projectPath = CustomWorldsEditorHelpers.GetProjectDirectoryPath();
+            data.packagePath = CustomWorldsEditorHelpers.GetPackageDirectoryPath();
+
+            if (data.projectPath != "")
+                EditorPrefs.SetString("projectPath", data.projectPath);
+            if (data.packagePath != "")
+                EditorPrefs.SetString("packagePath", data.packagePath);
         }
 
         void AddNewEnumEntry()
@@ -166,11 +242,10 @@ namespace Refsa.CustomWorld.Editor
                 return;
             }
 
-            string projectPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
+            /* string projectPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
             if (projectPath == null) return;
-
-            data.projectPath = Path.GetDirectoryName(projectPath);
-            UnityEngine.Debug.Log($"{data.projectPath}");
+            data.projectPath = Path.GetDirectoryName(projectPath); */
+            string projectPath = data.projectPath;
 
             string className = $"{data.wantedWorldType}World";
             string savePath = data.projectPath + $"/{className}.cs";

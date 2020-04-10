@@ -21,6 +21,17 @@ namespace Refsa.CustomWorld.Editor
             CustomWorldWindow.Create();
         }
 
+        /// <summary>
+        /// Creates all the required Custom World scripts in the currently selected folder
+        /// 
+        /// Checks if each of them have already been created before creating them
+        /// 
+        /// Creates:
+        ///     CustomWorldType enum
+        ///     Class derived from CustomBootstrapBase
+        ///     Attribute implementing ICustomWorldTypeAttribute
+        /// </summary>
+        /// <returns></returns>
         internal static Type SetupBaseBootstrap()
         {
             string path = GetProjectDirectoryPath();
@@ -61,10 +72,24 @@ namespace Refsa.CustomWorld.Editor
             return Type.GetType("CustomWorldBootstrap");
         }
 
-        internal static IReadOnlyList<string> GetUnassignedWorldTypes(Type current)
+        [MenuItem("Assets/Test")]
+        internal static void Test()
         {
-            Type attributeType = current.BaseType.GetGenericArguments()[1];
-            Type enumType = current.BaseType.GetGenericArguments()[0];
+            var baseType = Type.GetType("CustomWorldBootstrap");
+
+            var genericTypeDefinition = baseType.GetGenericTypeDefinition();
+            UnityEngine.Debug.Log($"{genericTypeDefinition}");
+        }
+
+        /// <summary>
+        /// Looks through the enum and checks if a class has already been created for them
+        /// </summary>
+        /// <param name="current">CustomBoostrapBase class </param>
+        /// <returns></returns>
+        internal static IReadOnlyList<string> GetUnassignedWorldTypes(Type baseType)
+        {
+            Type attributeType = baseType.BaseType.GetGenericArguments()[1];
+            Type enumType = baseType.BaseType.GetGenericArguments()[0];
 
             List<string> enumNames = System.Enum.GetNames(enumType).ToList();
 
@@ -82,6 +107,11 @@ namespace Refsa.CustomWorld.Editor
             return enumNames;
         }
 
+        /// <summary>
+        /// Checks if class of name already exists in project assemblies
+        /// </summary>
+        /// <param name="name">Name of object to look for</param>
+        /// <returns>true if it were found</returns>
         internal static bool ClassAlreadyExists(string name)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -94,6 +124,11 @@ namespace Refsa.CustomWorld.Editor
             return false;
         }
 
+        /// <summary>
+        /// Checks if the base bootstrap for Custom Worlds is setup.
+        /// </summary>
+        /// <param name="current"></param>
+        /// <returns></returns>
         internal static bool IsBaseSetup(out Type current)
         {
             foreach (var assembly in AppDomain.CurrentDomain.GetAssemblies())
@@ -112,6 +147,12 @@ namespace Refsa.CustomWorld.Editor
             return false;
         }
 
+        /// <summary>
+        /// Gets the current directory in relation to the Asset folder
+        /// 
+        /// Uses current selection, same quirks applies as with CustomWorldsEditorHelpers::GetCurrentAssetDirectory
+        /// </summary>
+        /// <returns></returns>
         internal static string GetProjectDirectoryPath()
         {
             string path = AssetDatabase.GetAssetPath(Selection.activeObject);
@@ -122,6 +163,14 @@ namespace Refsa.CustomWorld.Editor
             return path;
         }
 
+        /// <summary>
+        /// Gets the current directory in relation to the Asset folder
+        /// 
+        /// Makes use of the current selection in order to find it. This means that there
+        /// needs to be an active selection for this to work. This is not the case after
+        /// Unity does a script reload.
+        /// </summary>
+        /// <returns></returns>
         internal static string GetCurrentAssetDirectory()
         {
             foreach (var obj in Selection.GetFiltered<UnityEngine.Object>(SelectionMode.Assets))
@@ -139,6 +188,13 @@ namespace Refsa.CustomWorld.Editor
             return "Assets";
         }
 
+        /// <summary>
+        /// Finds the location of the package contents.
+        /// 
+        /// If ran from the Assets folder it will find the path there
+        /// If ran as a package it will look in /Library/PackageCache/ for the com.refsa.customworld folder
+        /// </summary>
+        /// <returns>Full system path of the package /Editor folder</returns>
         internal static string GetPackageDirectoryPath()
         {
             string currentPath = Application.dataPath.Replace("/Assets", "") + "/Library/PackageCache/";
@@ -163,6 +219,11 @@ namespace Refsa.CustomWorld.Editor
             return currentPath;
         }
 
+        /// <summary>
+        /// Looks through the project folders for the specified file name
+        /// </summary>
+        /// <param name="fileName">Name of the file</param>
+        /// <returns>null if not found, full system path if found</returns>
         internal static string FindFileInProject(string fileName)
         {
             var pathSearch = Directory.GetFiles(Application.dataPath, fileName, SearchOption.AllDirectories);

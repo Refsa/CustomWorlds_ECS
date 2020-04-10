@@ -10,12 +10,12 @@ namespace Refsa.CustomWorld.Editor
         Cancel
     }
 
-    internal interface IModal<T> where T : struct
+    internal interface IModal<T> where T : class
     {
         void ModalClosed(T data);
     }
 
-    internal abstract class ModalWindow<T> : EditorWindow where T : struct
+    internal abstract class ModalWindow<T> : EditorWindow where T : class
     {
         protected T data;
         protected IModal<T> owner;

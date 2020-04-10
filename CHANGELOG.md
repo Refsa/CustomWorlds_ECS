@@ -7,6 +7,11 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.1.1
+### Changes
+
+### Fixes
+
 ## 1.1.0
 ### Changes
 - Removed NewWorldWindow.cs from Editor project
