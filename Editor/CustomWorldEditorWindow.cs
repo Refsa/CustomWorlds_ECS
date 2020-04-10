@@ -37,8 +37,8 @@ namespace Refsa.CustomWorld.Editor
         {
 
             var window = CustomWorldWindow.CreateInstance<CustomWorldWindow>();
-            window.minSize = new Vector2(400, 150);
-            window.maxSize = new Vector2(400, 150);
+            window.minSize = new Vector2(600, 400);
+            // window.maxSize = new Vector2(400, 400);
             window.titleContent = new GUIContent("Custom World Editor");
 
             window.showOKButton = false;
@@ -81,6 +81,8 @@ namespace Refsa.CustomWorld.Editor
 
             foreach (string name in System.Enum.GetNames(data.bootstrapType.BaseType.GetGenericArguments()[0]))
             {   
+                if (name == "Default") continue;
+
                 bool exists = CustomWorldsEditorHelpers.ClassAlreadyExists(name + "World");
 
                 data.worldTypeData.Add(
@@ -109,42 +111,72 @@ namespace Refsa.CustomWorld.Editor
 
         void DrawSetupBootstrap()
         {
-            EditorGUILayout.BeginVertical();
-
-            if (GUILayout.Button("Setup Bootstrap"))
+            GUILayout.BeginVertical();
             {
-                data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
+                if (GUILayout.Button("Setup Bootstrap"))
+                {
+                    data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
+                }
             }
-            EditorGUILayout.EndVertical();
+            GUILayout.EndVertical();
         }
 
         void DrawAddWorlds()
         {
-            EditorGUILayout.BeginVertical();
-
-            if (data.availableWorldTypes != null && data.availableWorldTypes.Count != 0)
+            GUILayout.BeginVertical(GUILayout.Width(position.width));
             {
-                index = EditorGUILayout.Popup(index, data.availableWorldTypes.ToArray());
+                GUILayout.BeginVertical();
+                {
+                    GUILayout.BeginHorizontal();
+                    {
+                        EditorGUILayout.LabelField("Enum Name", GUILayout.Width(position.width / 3f));
+                        EditorGUILayout.LabelField("Class Name", GUILayout.Width(position.width / 3f));
+                        EditorGUILayout.LabelField("Action", GUILayout.Width(position.width / 3f));
+                    }
+                    GUILayout.EndHorizontal();
 
-                if (index != -1)
-                {
-                    data.wantedWorldType = data.availableWorldTypes[index];
-                }
+                    foreach (var worldTypeData in data.worldTypeData)
+                    {
+                        GUILayout.BeginHorizontal();
 
-                if (GUILayout.Button("Add World"))
-                {
-                    AddNewWorld();
+                        EditorGUILayout.LabelField(worldTypeData.name, GUILayout.Width(position.width / 3f));
+
+                        if (!worldTypeData.classExists)
+                        {
+                            EditorGUILayout.LabelField("NULL", GUILayout.Width(position.width / 3f));
+                            if (GUILayout.Button("Create Class", GUILayout.Width(position.width / 3f)))
+                            {
+                                data.wantedWorldType = worldTypeData.name;
+                                AddNewWorld();
+                            }
+                        }
+                        else
+                        {
+                            EditorGUILayout.LabelField(worldTypeData.className, GUILayout.Width(position.width / 3f));
+                            if (GUILayout.Button("Remove", GUILayout.Width(position.width / 3f)))
+                            {
+
+                            }
+                        }
+
+                        GUILayout.EndHorizontal();
+                    }
                 }
-            }
-            else
-            {
-                data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type Enum Entry", data.addNewWorldTypeEnum);
-                if (GUILayout.Button("Add World Type Enum"))
+                GUILayout.EndVertical();
+
+                EditorGUILayout.Space(20);
+
+                GUILayout.BeginVertical();
                 {
-                    AddNewEnumEntry();
+                    data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type", data.addNewWorldTypeEnum);
+                    if (GUILayout.Button("Add World Type"))
+                    {
+                        AddNewEnumEntry();
+                    }
                 }
+                GUILayout.EndVertical();
             }
-            EditorGUILayout.EndVertical();
+            GUILayout.EndVertical();
         }
 #endregion
 

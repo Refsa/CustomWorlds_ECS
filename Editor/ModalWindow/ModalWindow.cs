@@ -51,33 +51,37 @@ namespace Refsa.CustomWorld.Editor
         {
             if (requestClose) Close();
 
-            EditorGUILayout.BeginHorizontal();
+            GUILayout.BeginVertical();
             {
-                EditorGUILayout.LabelField(title);
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                Draw();
-            }
-            EditorGUILayout.EndHorizontal();
-
-            EditorGUILayout.BeginHorizontal();
-            {
-                if (showOKButton)
+                GUILayout.BeginHorizontal();
                 {
-                    if (GUILayout.Button(OKText))
+                    EditorGUILayout.LabelField(title);
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal(GUILayout.Width(position.width));
+                {
+                    Draw();
+                }
+                GUILayout.EndHorizontal();
+
+                GUILayout.BeginHorizontal();
+                {
+                    if (showOKButton)
                     {
-                        OK();
+                        if (GUILayout.Button(OKText))
+                        {
+                            OK();
+                        }
+                    }
+                    if (GUILayout.Button(cancelText))
+                    {
+                        Cancel();
                     }
                 }
-                if (GUILayout.Button(cancelText))
-                {
-                    Cancel();
-                }
+                GUILayout.EndHorizontal();
             }
-            EditorGUILayout.EndHorizontal();
+            GUILayout.EndVertical();
         }
 
         protected abstract void Draw();

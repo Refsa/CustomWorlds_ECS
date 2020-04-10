@@ -9,8 +9,13 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 
 ## 1.1.1
 ### Changes
+- Changes to Custom World editor window to make the process of setting up and creating new worlds less cumbersome
 
 ### Fixes
+- Fix to not finding project path after script reload
+
+### Known Issues
+- 
 
 ## 1.1.0
 ### Changes
@@ -23,7 +28,7 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - Custom World editor window can now add new entires to the CustomWorldType enum
 - New context menu path of Custom World editor window is "Assets/Create/CustomWorld"
 
-### Known Bugs
+### Known Issues
 - If Custom World editor window is kept open after recompilation it will no longer hold the
 correct project path to save new files. There is a temporary fix for this until I can find a
 way to retreive current project path from the Project window.
