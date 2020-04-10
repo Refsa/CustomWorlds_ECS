@@ -204,8 +204,8 @@ namespace Refsa.CustomWorld.Editor
         void ScriptsReloaded()
         {
             data = new CustomWorldWindowData();
-            data.packagePath = EditorPrefs.GetString("packagePath");
-            data.projectPath = EditorPrefs.GetString("projectPath");
+            data.packagePath = EditorPrefs.GetString("com.refsa.customworld.packagePath");
+            data.projectPath = EditorPrefs.GetString("com.refsa.customworld.projectPath");
 
             isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out data.bootstrapType);
 
@@ -230,9 +230,9 @@ namespace Refsa.CustomWorld.Editor
             data.packagePath = CustomWorldsEditorHelpers.GetPackageDirectoryPath();
 
             if (data.projectPath != "")
-                EditorPrefs.SetString("projectPath", data.projectPath);
+                EditorPrefs.SetString("com.refsa.customworld.projectPath", data.projectPath);
             if (data.packagePath != "")
-                EditorPrefs.SetString("packagePath", data.packagePath);
+                EditorPrefs.SetString("com.refsa.customworld.packagePath", data.packagePath);
         }
         
         /// <summary>

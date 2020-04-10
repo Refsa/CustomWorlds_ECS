@@ -11,6 +11,7 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Changes
 - Cleaned up CustomWorldEditorWindow, removed unused functionality and added comments
 - Clicking the "Add World Type" button now both adds an entry to the enum and creates the class file
+- Changed key entries in EditorPrefs to something more unique to avoid key collision
 
 ## 1.1.1
 ### Added
