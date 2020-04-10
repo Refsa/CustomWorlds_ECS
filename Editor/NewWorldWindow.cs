@@ -27,7 +27,7 @@ namespace Refsa.CustomWorld.Editor
             window.maxSize = new Vector2(300, 100);
 
             window.data.path = CustomWorldsEditorHelpers.GetProjectDirectoryPath();
-            string templatePath = CustomWorldsEditorHelpers.GetDirectoryPath() + "/ScriptTemplates/CustomWorld.cs.txt";
+            string templatePath = CustomWorldsEditorHelpers.GetPackageDirectoryPath() + "/ScriptTemplates/CustomWorld.cs.txt";
             string newWorldContents = "";
 
             using (var newWorldTemplate = File.OpenText(templatePath))

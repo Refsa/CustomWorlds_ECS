@@ -19,8 +19,13 @@ namespace Refsa.CustomWorld.Editor
     {
         protected T data;
         protected IModal<T> owner;
-        protected string title = "MODALWINDOW";
         protected ModalResult result;
+
+        protected string cancelText = "Cancel";
+        protected string OKText = "OK";
+        protected bool showOKButton = true;
+
+        protected bool requestClose = false;
 
         public ModalResult Result => result;
 
@@ -30,7 +35,7 @@ namespace Refsa.CustomWorld.Editor
 
             owner?.ModalClosed(data);
 
-            Close();
+            requestClose = true;
         }
 
         protected virtual void OK()
@@ -39,11 +44,13 @@ namespace Refsa.CustomWorld.Editor
 
             owner?.ModalClosed(data);
 
-            Close();
+            requestClose = true;
         }
 
         private void OnGUI()
         {
+            if (requestClose) Close();
+
             EditorGUILayout.BeginHorizontal();
             {
                 EditorGUILayout.LabelField(title);
@@ -58,11 +65,14 @@ namespace Refsa.CustomWorld.Editor
 
             EditorGUILayout.BeginHorizontal();
             {
-                if (GUILayout.Button("OK"))
+                if (showOKButton)
                 {
-                    OK();
+                    if (GUILayout.Button(OKText))
+                    {
+                        OK();
+                    }
                 }
-                if (GUILayout.Button("Cancel"))
+                if (GUILayout.Button(cancelText))
                 {
                     Cancel();
                 }

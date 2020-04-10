@@ -7,6 +7,12 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.0.2
+### Changes
+- Custom World editor window helper is now moved into a single window
+- Custom World editor window can now add new entires to the CustomWorldType enum
+- New context menu path of Custom World editor window is "Assets/Create/CustomWorld"
+
 ## 1.0.1
 ### Fixed
 - Fixed Setup menu item to look for already existing enum and attribute to avoid overriding 

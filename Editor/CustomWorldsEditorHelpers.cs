@@ -15,7 +15,7 @@ namespace Refsa.CustomWorld.Editor
     {
         const int ContextMenuSorting = 50;
 
-        [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
+        /* [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
         [MenuItem("Assets/Create/Custom World/Setup", false, ContextMenuSorting)]
         public static void SetupCustomWorldBootstrap()
         {
@@ -71,6 +71,52 @@ namespace Refsa.CustomWorld.Editor
             }
 
             NewWorldWindow.Create(current);
+        } */
+
+        [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
+        public static void ShowCustomWorldWindow()
+        {
+            CustomWorldWindow.Create();
+        }
+
+        internal static Type SetupBaseBootstrap()
+        {
+            string path = GetProjectDirectoryPath();
+            string currentPath = GetPackageDirectoryPath();
+
+            if (!ClassAlreadyExists("CustomWorldType"))
+                using (var enumTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeEnum.cs.txt"))
+                {
+                    string enumFileContents = enumTemplate.ReadToEnd();
+                    using (var enumFile = File.CreateText(path + "/CustomWorldType.cs"))
+                    {
+                        enumFile.Write(enumFileContents);
+                    }
+                }
+
+            if (!ClassAlreadyExists("CustomWorldTypeAttribute"))
+                using (var attributeTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeAttribute.cs.txt"))
+                {
+                    string enumFileContents = attributeTemplate.ReadToEnd();
+                    using (var enumFile = File.CreateText(path + "/CustomWorldTypeAttribute.cs"))
+                    {
+                        enumFile.Write(enumFileContents);
+                    }
+                }
+
+            if (!ClassAlreadyExists("CustomBootstrap"))
+                using (var bootstrapTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomBootstrap.cs.txt"))
+                {
+                    string enumFileContents = bootstrapTemplate.ReadToEnd();
+                    using (var enumFile = File.CreateText(path + "/CustomWorldBootstrap.cs"))
+                    {
+                        enumFile.Write(enumFileContents);
+                    }
+                }
+
+            AssetDatabase.Refresh();
+
+            return Type.GetType("CustomWorldBootstrap");
         }
 
         internal static IReadOnlyList<string> GetUnassignedWorldTypes(Type current)
@@ -134,9 +180,9 @@ namespace Refsa.CustomWorld.Editor
             return path;
         }
 
-        internal static string GetDirectoryPath()
+        internal static string GetPackageDirectoryPath()
         {
-            string currentPath = Directory.GetCurrentDirectory().Replace("/Assets", "") + "/Library/PackageCache/";
+            string currentPath = Application.dataPath.Replace("/Assets", "") + "/Library/PackageCache/";
             bool foundPackagePath = false;
 
             foreach(var dir in Directory.GetDirectories(currentPath))
@@ -152,7 +198,7 @@ namespace Refsa.CustomWorld.Editor
             if (!foundPackagePath)
             {
                 UnityEngine.Debug.LogError($"Could not find Package path for com.refsa.customworld");
-                currentPath = Directory.GetCurrentDirectory() + "/Assets/Scripts/ECS/CustomWorld/Editor";
+                currentPath = Application.dataPath + "/Scripts/ECS/CustomWorld/Editor";
             }
 
             return currentPath;
