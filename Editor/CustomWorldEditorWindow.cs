@@ -155,7 +155,8 @@ namespace Refsa.CustomWorld.Editor
                             EditorGUILayout.LabelField(worldTypeData.className, GUILayout.Width(position.width / 3f));
                             if (GUILayout.Button("Remove", GUILayout.Width(position.width / 3f)))
                             {
-
+                                data.wantedWorldType = worldTypeData.name;
+                                RemoveWorld();
                             }
                         }
 
@@ -171,7 +172,7 @@ namespace Refsa.CustomWorld.Editor
                     data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type", data.addNewWorldTypeEnum);
                     if (GUILayout.Button("Add World Type"))
                     {
-                        AddNewEnumEntry();
+                        AddEnumEntry();
                     }
                 }
                 GUILayout.EndVertical();
@@ -226,7 +227,7 @@ namespace Refsa.CustomWorld.Editor
                 EditorPrefs.SetString("packagePath", data.packagePath);
         }
 
-        void AddNewEnumEntry()
+        void AddEnumEntry()
         {
             if (data.addNewWorldTypeEnum == null || data.addNewWorldTypeEnum == "") 
             {
@@ -254,15 +255,40 @@ namespace Refsa.CustomWorld.Editor
                 }
             }
 
-            enumFileContents[enumFileContents.Count - 2] += ",";
+            if (!enumFileContents[enumFileContents.Count - 2].Contains(","))
+            {
+                enumFileContents[enumFileContents.Count - 2] += ",";
+            }
             enumFileContents.Insert(enumFileContents.Count - 1, "\t" + data.addNewWorldTypeEnum);
 
             using (var enumFile = File.CreateText(worldTypeEnumPath))
             {
-                enumFile.Write(enumFileContents.Aggregate((r, e) => r += e + "\n"));
+                enumFile.Write(enumFileContents.Aggregate("", (r, e) => r + e + "\n"));
             }
 
             data.addNewWorldTypeEnum = "";
+
+            AssetDatabase.Refresh();
+        }
+
+        void RemoveEnumEntry(string enumEntryName)
+        {
+            string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
+            if (worldTypeEnumPath == null) return;
+
+            string enumFileContents = "";
+            using (var enumFile = File.OpenText(worldTypeEnumPath))
+            {
+                enumFileContents = 
+                    enumFile.ReadToEnd()
+                    .Replace("\t" + enumEntryName + "\n", "")
+                    .Replace("\t" + enumEntryName + ",\n", "");
+            }
+
+            using (var enumFile = File.CreateText(worldTypeEnumPath))
+            {
+                enumFile.Write(enumFileContents);
+            }
 
             AssetDatabase.Refresh();
         }
@@ -294,6 +320,22 @@ namespace Refsa.CustomWorld.Editor
                 newWorldFile.Write(data.newWorldTemplate);
             }
 
+            data.wantedWorldType = "";
+            AssetDatabase.Refresh();
+        }
+
+        void RemoveWorld()
+        {
+            string projectPath = data.projectPath;
+            string className = $"{data.wantedWorldType}World";
+            string savePath = CustomWorldsEditorHelpers.FindFileInProject(className + ".cs");
+
+            if (savePath == null) return;
+
+            RemoveEnumEntry(data.wantedWorldType);
+            File.Delete(savePath);
+
+            data.wantedWorldType = "";
             AssetDatabase.Refresh();
         }
 

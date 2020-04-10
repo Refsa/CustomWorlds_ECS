@@ -8,11 +8,16 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - 
 
 ## 1.1.1
+### Added
+- Adding functionality to remove world types from Custom World editor window
+    - It will remove the enum entry and any associated class
+
 ### Changes
 - Changes to Custom World editor window to make the process of setting up and creating new worlds less cumbersome
 
 ### Fixes
 - Fix to not finding project path after script reload
+- Fixed adding enum entry Linq Aggregate to property restructure file
 
 ### Known Issues
 - 
