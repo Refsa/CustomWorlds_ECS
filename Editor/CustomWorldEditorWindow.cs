@@ -60,6 +60,9 @@ namespace Refsa.CustomWorld.Editor
             requestClose = true;
         }
 
+        /// <summary>
+        /// Sets up required data from a fresh window
+        /// </summary>
         void SetupData()
         {
             data = new CustomWorldWindowData();
@@ -71,10 +74,12 @@ namespace Refsa.CustomWorld.Editor
             if (isBaseSetup)
             {
                 SetupWorldTypeData();
-                FindAvailableWorldTypes(data.bootstrapType);
             }
         }
 
+        /// <summary>
+        /// Sets up the data required to display information about existing worlds
+        /// </summary>
         void SetupWorldTypeData()
         {
             data.worldTypeData = new List<WorldTypeData>();
@@ -172,7 +177,8 @@ namespace Refsa.CustomWorld.Editor
                     data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type", data.addNewWorldTypeEnum);
                     if (GUILayout.Button("Add World Type"))
                     {
-                        AddEnumEntry();
+                        // AddEnumEntry();
+                        AddWorld();
                     }
                 }
                 GUILayout.EndVertical();
@@ -210,12 +216,14 @@ namespace Refsa.CustomWorld.Editor
 
             if (isBaseSetup)
             {
-                FindAvailableWorldTypes(data.bootstrapType);
                 SetupWorldTypeData();
             }
         }
 #endregion
 
+        /// <summary>
+        /// Event handler for Selection.selectionChanged event
+        /// </summary>
         void OnSelectionChanged()
         {
             data.projectPath = CustomWorldsEditorHelpers.GetProjectDirectoryPath();
@@ -226,12 +234,16 @@ namespace Refsa.CustomWorld.Editor
             if (data.packagePath != "")
                 EditorPrefs.SetString("packagePath", data.packagePath);
         }
-
-        void AddEnumEntry()
+        
+        /// <summary>
+        /// Adds a new entry to the CustomWorldType enum
+        /// </summary>
+        /// <returns>true if a new entry was added</returns>
+        bool AddEnumEntry()
         {
             if (data.addNewWorldTypeEnum == null || data.addNewWorldTypeEnum == "") 
             {
-                return;
+                return false;
             }
 
             foreach (string name in System.Enum.GetNames(data.bootstrapType.BaseType.GetGenericArguments()[0]))
@@ -239,12 +251,12 @@ namespace Refsa.CustomWorld.Editor
                 if (data.addNewWorldTypeEnum == name)
                 {
                     data.addNewWorldTypeEnum = "";
-                    return;
+                    return false;
                 }
             }
 
             string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
-            if (worldTypeEnumPath == null) return;
+            if (worldTypeEnumPath == null) return false;
 
             List<string> enumFileContents = new List<string>();
             using (var enumFile = File.OpenText(worldTypeEnumPath))
@@ -267,10 +279,15 @@ namespace Refsa.CustomWorld.Editor
             }
 
             data.addNewWorldTypeEnum = "";
-
             AssetDatabase.Refresh();
+
+            return true;
         }
 
+        /// <summary>
+        /// Removes an entry from the CustomWorldType enum
+        /// </summary>
+        /// <param name="enumEntryName"></param>
         void RemoveEnumEntry(string enumEntryName)
         {
             string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
@@ -293,6 +310,26 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Adds the CustomWorldType enum entry
+        /// Adds class file if enum was successfully adde
+        /// </summary>
+        void AddWorld()
+        {
+            data.wantedWorldType = data.addNewWorldTypeEnum;
+            if (AddEnumEntry())
+            {
+                AddNewWorld();
+            }
+            else
+            {
+                data.wantedWorldType = "";
+            }
+        }
+
+        /// <summary>
+        /// Adds a new world from the enum name in data.wantedWorldType
+        /// </summary>
         void AddNewWorld()
         {
             if (data.wantedWorldType == null || data.wantedWorldType == "")
@@ -324,6 +361,11 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Removes a world.
+        /// 
+        /// Deletes the class file and removes the entry from the CustomWorldType enum
+        /// </summary>
         void RemoveWorld()
         {
             string projectPath = data.projectPath;
@@ -339,6 +381,9 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
+        /// <summary>
+        /// Finds the script template for CustomWorld classes
+        /// </summary>
         void SetupNewWorldTemplatePath()
         {
             string templatePath = CustomWorldsEditorHelpers.GetPackageDirectoryPath() + "/ScriptTemplates/CustomWorld.cs.txt";
@@ -355,19 +400,6 @@ namespace Refsa.CustomWorld.Editor
             }
 
             data.newWorldTemplate = newWorldContents;
-        }
-
-        void FindAvailableWorldTypes(Type bootstrapType)
-        {
-            data.availableWorldTypes = new List<string>();
-
-            foreach (string name in System.Enum.GetNames(bootstrapType.BaseType.GetGenericArguments()[0]))
-            {   
-                if (!CustomWorldsEditorHelpers.ClassAlreadyExists(name + "World") && name != "Default")
-                {
-                    data.availableWorldTypes.Add(name);
-                }
-            }
         }
     }
 }
