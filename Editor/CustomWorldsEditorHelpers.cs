@@ -35,7 +35,11 @@ namespace Refsa.CustomWorld.Editor
         internal static Type SetupBaseBootstrap()
         {
             string path = GetProjectDirectoryPath();
+            if (path == null || path == "")
+                path = EditorPrefs.GetString("com.refsa.customworld.projectPath");
             string currentPath = GetPackageDirectoryPath();
+            if (currentPath == null || currentPath == "")
+                currentPath = EditorPrefs.GetString("com.refsa.customworld.packagePath");
 
             if (!ClassAlreadyExists("CustomWorldType"))
                 using (var enumTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeEnum.cs.txt"))
