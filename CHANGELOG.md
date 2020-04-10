@@ -7,6 +7,11 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.1.0
+### Changes
+- Removed NewWorldWindow.cs from Editor project
+- Cleaned up CustomWorldsEditorHelpers.cs
+
 ## 1.0.2
 ### Changes
 - Custom World editor window helper is now moved into a single window

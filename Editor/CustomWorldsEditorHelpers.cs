@@ -15,64 +15,6 @@ namespace Refsa.CustomWorld.Editor
     {
         const int ContextMenuSorting = 50;
 
-        /* [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
-        [MenuItem("Assets/Create/Custom World/Setup", false, ContextMenuSorting)]
-        public static void SetupCustomWorldBootstrap()
-        {
-            if (IsBaseSetup(out Type current))
-            {
-                UnityEngine.Debug.LogError($"Bootstrap for Custom World already exists: {current.Name}");
-                return;
-            }
-
-            string path = GetProjectDirectoryPath();
-            string currentPath = GetDirectoryPath();
-
-            if (!ClassAlreadyExists("CustomWorldType"))
-                using (var enumTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeEnum.cs.txt"))
-                {
-                    string enumFileContents = enumTemplate.ReadToEnd();
-                    using (var enumFile = File.CreateText(path + "/CustomWorldType.cs"))
-                    {
-                        enumFile.Write(enumFileContents);
-                    }
-                }
-
-            if (!ClassAlreadyExists("CustomWorldTypeAttribute"))
-                using (var attributeTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomWorldTypeAttribute.cs.txt"))
-                {
-                    string enumFileContents = attributeTemplate.ReadToEnd();
-                    using (var enumFile = File.CreateText(path + "/CustomWorldTypeAttribute.cs"))
-                    {
-                        enumFile.Write(enumFileContents);
-                    }
-                }
-
-            if (!ClassAlreadyExists("CustomBootstrap"))
-                using (var bootstrapTemplate = File.OpenText(currentPath + "/ScriptTemplates/CustomBootstrap.cs.txt"))
-                {
-                    string enumFileContents = bootstrapTemplate.ReadToEnd();
-                    using (var enumFile = File.CreateText(path + "/CustomWorldBootstrap.cs"))
-                    {
-                        enumFile.Write(enumFileContents);
-                    }
-                }
-
-            AssetDatabase.Refresh();
-        }
-
-        [MenuItem("Assets/Create/Custom World/New Custom World", false, ContextMenuSorting + 11)]
-        public static void CreateNewCustomWorld()
-        {
-            if (!IsBaseSetup(out Type current))
-            {
-                UnityEngine.Debug.LogError($"Base Bootstrap for Custom World is not setup");
-                return;
-            }
-
-            NewWorldWindow.Create(current);
-        } */
-
         [MenuItem("Assets/Create/Custom World", false, ContextMenuSorting)]
         public static void ShowCustomWorldWindow()
         {
