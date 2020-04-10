@@ -180,6 +180,23 @@ namespace Refsa.CustomWorld.Editor
             return path;
         }
 
+        internal static string GetCurrentAssetDirectory()
+        {
+            foreach (var obj in Selection.GetFiltered<UnityEngine.Object>(SelectionMode.Assets))
+            {
+                var path = AssetDatabase.GetAssetPath(obj);
+                if (string.IsNullOrEmpty(path))
+                    continue;
+
+                if (System.IO.Directory.Exists(path))
+                    return path;
+                else if (System.IO.File.Exists(path))
+                    return System.IO.Path.GetDirectoryName(path);
+            }
+
+            return "Assets";
+        }
+
         internal static string GetPackageDirectoryPath()
         {
             string currentPath = Application.dataPath.Replace("/Assets", "") + "/Library/PackageCache/";
@@ -202,6 +219,19 @@ namespace Refsa.CustomWorld.Editor
             }
 
             return currentPath;
+        }
+
+        internal static string FindFileInProject(string fileName)
+        {
+            var pathSearch = Directory.GetFiles(Application.dataPath, fileName, SearchOption.AllDirectories);
+
+            if (pathSearch.Length == 0)
+            {
+                UnityEngine.Debug.LogWarning($"Could not find {fileName}");
+                return null;
+            }
+
+            return pathSearch[0];
         }
     }
 }

@@ -134,16 +134,10 @@ namespace Refsa.CustomWorld.Editor
                 }
             }
 
-            var pathSearch = Directory.GetFiles(Application.dataPath, "CustomWorldType.cs", SearchOption.AllDirectories);
-            if (pathSearch.Length == 0)
-            {
-                UnityEngine.Debug.LogWarning($"Could not find CustomWorldType.cs");
-                return;
-            }
+            string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
+            if (worldTypeEnumPath == null) return;
 
-            string worldTypeEnumPath = pathSearch[0];
             List<string> enumFileContents = new List<string>();
-
             using (var enumFile = File.OpenText(worldTypeEnumPath))
             {
                 while (!enumFile.EndOfStream)
@@ -172,8 +166,12 @@ namespace Refsa.CustomWorld.Editor
                 return;
             }
 
-            data.projectPath = CustomWorldsEditorHelpers.GetProjectDirectoryPath();
+            string projectPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
+            if (projectPath == null) return;
+
+            data.projectPath = Path.GetDirectoryName(projectPath);
             UnityEngine.Debug.Log($"{data.projectPath}");
+
             string className = $"{data.wantedWorldType}World";
             string savePath = data.projectPath + $"/{className}.cs";
 

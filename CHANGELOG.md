@@ -13,6 +13,11 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - Custom World editor window can now add new entires to the CustomWorldType enum
 - New context menu path of Custom World editor window is "Assets/Create/CustomWorld"
 
+### Known Bugs
+- If Custom World editor window is kept open after recompilation it will no longer hold the
+correct project path to save new files. There is a temporary fix for this until I can find a
+way to retreive current project path from the Project window.
+
 ## 1.0.1
 ### Fixed
 - Fixed Setup menu item to look for already existing enum and attribute to avoid overriding 
