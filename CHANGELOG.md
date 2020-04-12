@@ -17,6 +17,7 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 
 ### Changes
 - Updated documentation to reflect the new changes to the Editor Window
+- Updated some styling on editor window to be more readable
 
 ## 1.2.2
 ### Added

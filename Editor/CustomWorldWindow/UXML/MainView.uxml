@@ -55,8 +55,8 @@
             
             <engine:VisualElement name="ExistingSystemsInnerContainer">
                 <engine:VisualElement name="SystemInfoTitle">
-                    <engine:Label text="World Name"/>
-                    <engine:Label text="System Name"/>
+                    <engine:Label text="World Name" class="WorldTypeEnum" />
+                    <engine:Label text="System Name" class="SystemName" />
                 </engine:VisualElement>
 
                 <engine:ScrollView name="SystemInfoContainer">
