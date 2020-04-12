@@ -1,54 +1,74 @@
 # DOCUMENTATION
 
-## Content Overview
-The use of this package should be as smooth as possible. As such the core stuff in this package
-will handle all the default setup of worlds, but also allows the user to further extend how worlds are setup.
+## What?
+This package will help you create and manage additional worlds for Unity DOTS. It should work as smoothly as
+possible and not affect your current project without you explicitly configuring it.
 
-## Auto Setup
-To help with creating all the **required** types for using the custom worlds framework there exists a context
-menu item on "Assets/Create/Custom World". Under this menu there is a Setup item and a New Custom World item.
-
-### Setup - Context Menu Item
-Setup will create the core components **required** to use the framework:
-
-#### CustomBootstrapBase class
-It will create a class deriving from __CustomBootstrapBase__ in order to override the internal world creation from Unity.
-
-#### CustomWorldType enum
-It will create a new __enum__ with the name __CustomWorldType__ that you can populate with the custom worlds you want to 
-implement.
-
-#### CustomWorldTypeAttribute Attribute
-It will create the appropriate __attribute__ in order to mark Systems and SystemGroups to be spawned in a Custom World.
-
-### New Custom World - Context Menu Item
-New Custom World will create a new class deriving from the CustomWorldBase class. To make use of this functionality
-you have to implement more world types in the CustomWorldType enum. Only one class deriving CustomWorldBase can exist
-per World tag in the CustomWorldType enum.
-
-## How Does It Work
+## How?
 To override the internal world setup by unity this package implements the ICustomBootstrap interface.
 Unity will look for and use the first Class that derives from this interface. If more than one class
 deriving from this interface exists Unity will only use the first one that returns true from ICustomBootstrap::Initialize.
 
-## How To
+### Auto Setup
+To help with creating all the **required** types for using the custom worlds framework there exists a context
+menu item on "Assets/Create/Custom World". This will open an Editor Window to help setup and manage worlds.
+
+#### Setup
+First time opening the window it will show a button to setup the **required** components. It will creating these
+in the last selected folder or the folder of the last selected asset in the project view. 
+
+##### CustomBootstrapBase class
+- It will create a class deriving from __CustomBootstrapBase__ in order to override the internal world creation from Unity.
+
+##### CustomWorldType enum
+- It will create a new __enum__ with the name __CustomWorldType__ that you can populate with the custom worlds you want to 
+implement.
+
+##### CustomWorldTypeAttribute Attribute
+- It will create the appropriate __attribute__ in order to mark Systems and SystemGroups to be spawned in a Custom World.
+
+### Adding and managing worlds
+
+#### Creating and Managing worlds
+After the bootstrap has been setup it will show two different views. The left side shows currently added worlds
+and an option to add new worlds. The right side will show an overview over all classes deriving from ComponentSystemBase in
+your current project.
+
+#### Adding new worlds
+Typing in a name and clicking on Add World will create a new entry into the CustomWorldType enum and create a new class
+that inherits from __CustomWorldBase__. The name of the class will be \[\{WorldName\}World\]
+
+#### Managing systems
+To help with setting up the required attribute on classes the right side of the Editor Window will show all classes that derive
+from ComponentSystemBase. Here you can change the world attribute tag on those systems. This will make it a bit easier to manage
+and get an overview of the systems and what world they go into.
+
+Doing it manually you can add in multiple attribute tags on systems to spawn them into multiple worlds. This is not supported by the 
+editor at this time, but will come in a future release.
+
+## How to setup without editor window
+Using the above auto setup is not required to use this package. If you want direct control over it you can extend and change
+it to your needs. 
 
 ### World Type Enum
-**You need to setup an enum** you will use to tag your systems and worlds with.
+**You need to setup an enum** you will use to tag your systems and worlds with. It should always contain a default entry
+that all untagged systems will go into.
 
 Example Enum:
 ```csharp
 public enum CustomWorldType
 {
     Default = 0,
-    MainMenu,
     Game
 }
 ```
 
 ### ICustomWorldTypeAttribute
 **You will need to create an attribute class** that derives from this interface. This will be used later on
-so you can tag your systems and worlds with an Enum that identifies it.
+so you can tag your systems and worlds with an Enum that identifies it. Untagged systems go into the default 
+world, so the attribute is not required.
+
+Currently you can add multiple tags to a system for it to spawn into multiple worlds.
 
 Attribute Setup Example:
 ```csharp

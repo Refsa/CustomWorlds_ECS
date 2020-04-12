@@ -7,6 +7,17 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.2.3
+### Added
+- Window can now be resized between (800, 600) and (1600, 1000)
+
+### Fixed
+- Fixed flex-shrink css property on some elements
+- Fixed margin and width on AddNewWorldContainer children
+
+### Changes
+- Updated documentation to reflect the new changes to the Editor Window
+
 ## 1.2.2
 ### Added
 - Added setup bootstrap button to new UIElements implementation
