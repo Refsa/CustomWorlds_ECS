@@ -8,6 +8,20 @@
     192B35
 */
 
+.FlexTemplateContainer {
+    width: 100%;
+    height: 100%;
+
+    display: flex;
+    flex-direction: row;
+}
+
+#SetupBootstrap {
+    margin: auto;
+    width: 30%;
+    height: 10%;
+}
+
 #SimpleLabel {
     width: 100%;
     height: 25px;

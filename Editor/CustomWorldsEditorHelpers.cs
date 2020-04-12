@@ -208,7 +208,8 @@ namespace Refsa.CustomWorld.Editor
             {
                 if (dir.Contains("com.refsa.customworld"))
                 {
-                    currentPath = dir + "/Editor";
+                    // currentPath = dir + "/Editor";
+                    currentPath = "Packages/com.refsa.customworld/Editor";
                     foundPackagePath = true;
                     break;
                 }
@@ -217,7 +218,8 @@ namespace Refsa.CustomWorld.Editor
             if (!foundPackagePath)
             {
                 UnityEngine.Debug.LogError($"Could not find Package path for com.refsa.customworld");
-                currentPath = Application.dataPath + "/Scripts/ECS/CustomWorld/Editor";
+                // currentPath = Application.dataPath + "/Scripts/ECS/CustomWorld/Editor";
+                currentPath = "Assets/Scripts/ECS/CustomWorld/Editor";
             }
 
             return currentPath;

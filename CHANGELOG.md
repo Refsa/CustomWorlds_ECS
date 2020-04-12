@@ -7,6 +7,14 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.2.2
+### Added
+- Added setup bootstrap button to new UIElements implementation
+
+### Fixes
+- Previous update to fix package path has been fixed properly
+- No longer attempting to draw world and system info if bootstrap is not setup
+
 ## 1.2.1
 ### Fixes
 - Fixed retreiving UXML and USS when library is used as package

@@ -81,48 +81,67 @@ namespace Refsa.CustomWorld.Editor
 		void SetupView()
 		{
 			// TODO: Change path to retreive UXML/USS in package release
-
-			string packagePath = "Assets/Scripts/ECS/CustomWorld/Editor";
-			try 
-			{
-				packagePath = data.packagePath.Remove(0, data.packagePath.IndexOf("/Library/PackageCache/")).Remove(0, 1);
-			} catch {}
-
 			var baseUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                (packagePath + "/CustomWorldWindow/UXML/BaseWindow.uxml");
+                (data.packagePath + "/CustomWorldWindow/UXML/BaseWindow.uxml");
                 
             var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>
-                (packagePath + "/CustomWorldWindow/USS/BaseStyle.uss");
+                (data.packagePath + "/CustomWorldWindow/USS/BaseStyle.uss");
 
             baseUxml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(uss);
 
-            worldTypeViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                (packagePath + "/CustomWorldWindow/UXML/WorldTypeView.uxml");
+			if (isBaseSetup)
+			{
+				var mainViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                	(data.packagePath + "/CustomWorldWindow/UXML/MainView.uxml");
 
-            systemInfoViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                (packagePath + "/CustomWorldWindow/UXML/SystemInfoView.uxml");
+				worldTypeViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                	(data.packagePath + "/CustomWorldWindow/UXML/WorldTypeView.uxml");
 
-            worldTypeContainer = rootVisualElement.Query("WorldTypeInnerContainer").First();
-            systemInfoContainer = rootVisualElement.Query("SystemInfoContainer").First();
+            	systemInfoViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                	(data.packagePath + "/CustomWorldWindow/UXML/SystemInfoView.uxml");
 
-            for (int i = 0; i < data.worldTypeData.Count; i++)
-            {
-                AddNewWorldTypeView(data.worldTypeData[i]);
-            }
+				var mainViewElement = mainViewUxml.CloneTree();
+				mainViewElement.AddToClassList("FlexTemplateContainer");
 
-            for (int i = 0; i < data.systemDatas.Count; i++)
-            {
-                var system = data.systemDatas[i];
-                AddNewSystemInfoView(system);
-            }
+				rootVisualElement.Query("MainContainer").First().Add(mainViewElement);
 
-			var addWorldTextInput = rootVisualElement.Query("AddWorldNameInput").First() as TextField;
-			(rootVisualElement.Query("AddWorldSubmit").First() as Button).clicked +=
-				() => {
-					data.addNewWorldTypeEnum = addWorldTextInput.value;
-					AddWorld();
-				};
+            	worldTypeContainer = rootVisualElement.Query("WorldTypeInnerContainer").First();
+            	systemInfoContainer = rootVisualElement.Query("SystemInfoContainer").First();
+
+            	for (int i = 0; i < data.worldTypeData.Count; i++)
+            	{
+            	    AddNewWorldTypeView(data.worldTypeData[i]);
+            	}
+
+            	for (int i = 0; i < data.systemDatas.Count; i++)
+            	{
+            	    var system = data.systemDatas[i];
+            	    AddNewSystemInfoView(system);
+            	}
+
+				var addWorldTextInput = rootVisualElement.Query("AddWorldNameInput").First() as TextField;
+				(rootVisualElement.Query("AddWorldSubmit").First() as Button).clicked +=
+					() => {
+						data.addNewWorldTypeEnum = addWorldTextInput.value;
+						AddWorld();
+					};
+			}
+			else
+			{
+				var setupBootstrapView = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                	(data.packagePath + "/CustomWorldWindow/UXML/SetupBootstrapView.uxml").CloneTree();
+
+				setupBootstrapView.AddToClassList("FlexTemplateContainer");
+				
+				(setupBootstrapView.Query("SetupBootstrap").First() as Button).clicked +=
+					() =>
+					{
+						data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
+					};
+
+				rootVisualElement.Query("MainContainer").First().Add(setupBootstrapView);
+			}
 		}
 
         void AddNewWorldTypeView(WorldTypeData data)

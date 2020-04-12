@@ -14,13 +14,5 @@
     <engine:Template path="Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/WorldTypeView.uxml" name="WorldTypeView" />
     <engine:Template path="Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/SystemInfoView.uxml" name="SystemInfoView" />
 
-    <engine:VisualElement name="TitleBar">
-        <engine:Label text="Custom World Editor" />
-    </engine:VisualElement>
-
-    <engine:VisualElement name="MainContainer">
-
-        
-
-    </engine:VisualElement>
+    <engine:Button name="SetupBootstrap" text="Setup Bootstrap" />
 </engine:UXML>

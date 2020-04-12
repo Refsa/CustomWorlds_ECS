@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements">
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="
+        UnityEngine.UIElements ../../../UIElementsSchema/UnityEngine.UIElements.xsd
+        UnityEditor.UIElements ../../../UIElementsSchema/UnityEditor.UIElements.xsd
+        UnityEngine.PackageManager.UI ../../../UIElementsSchema/UnityEditor.PackageManager.UI.xsd"
+>
+
+    <engine:Template path="Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/WorldTypeView.uxml" name="WorldTypeView" />
+    <engine:Template path="Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/SystemInfoView.uxml" name="SystemInfoView" />
+
+    <engine:VisualElement name="LeftContainer">
+
+        <engine:VisualElement name="AddNewWorldContainer">
+            <engine:VisualElement name="SimpleLabel">
+                <engine:Label text="Add New World" />
+            </engine:VisualElement>
+            <engine:VisualElement name="AddWorldContainer" >
+                <engine:TextField name="AddWorldNameInput" />
+                <engine:Button text="Add World" name="AddWorldSubmit" />
+            </engine:VisualElement>
+        </engine:VisualElement>
+        
+        <engine:VisualElement name="ExistingWorldsContainer">
+            <engine:VisualElement name="SimpleLabel">
+                <engine:Label text="Existing Worlds" />
+            </engine:VisualElement>
+            <engine:VisualElement name="WorldTypeContainer">
+                <engine:VisualElement name="WorldTypeContainerTitle">
+                    <engine:Label text="Enum Name" class="WorldName"/>
+                    <engine:Label text="Class Name" class="WorldClass"/>
+                </engine:VisualElement>
+
+                <engine:ScrollView name="WorldTypeInnerContainer">
+                    <!-- <engine:Instance template="WorldTypeView"/> -->
+                </engine:ScrollView>
+
+            </engine:VisualElement>
+        </engine:VisualElement>
+
+    </engine:VisualElement>
+
+    <engine:VisualElement name="RightContainer">
+
+        <engine:VisualElement name="SimpleLabel">
+            <engine:Label text="Systems"/>
+        </engine:VisualElement>
+        
+        <engine:VisualElement name="ExistingSystemsContainer">
+            
+            <engine:VisualElement name="ExistingSystemsInnerContainer">
+                <engine:VisualElement name="SystemInfoTitle">
+                    <engine:Label text="World Name"/>
+                    <engine:Label text="System Name"/>
+                </engine:VisualElement>
+
+                <engine:ScrollView name="SystemInfoContainer">
+                    <!-- <engine:Instance template="SystemInfoView"/> -->
+                </engine:ScrollView>
+            </engine:VisualElement>
+
+        </engine:VisualElement>
+
+    </engine:VisualElement>
+
+</engine:UXML>
