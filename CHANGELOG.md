@@ -7,6 +7,11 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.2.0
+### Added
+- Added overview of systems and systemgroups to Custom World Editor Window
+    - Adding in ability to set the attribute on classes through the editor tool
+
 ## 1.1.2
 ### Changes
 - Cleaned up CustomWorldEditorWindow, removed unused functionality and added comments

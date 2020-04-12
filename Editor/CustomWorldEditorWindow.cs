@@ -2,16 +2,25 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using Unity.Entities;
 using UnityEditor;
 using UnityEngine;
 
 namespace Refsa.CustomWorld.Editor
 {   
-    internal struct WorldTypeData
+    internal class WorldTypeData
     {
         public string name;
         public bool classExists;
         public string className;
+    }
+
+    internal class SystemData
+    {
+        public string name;
+        public string world;
+        public Type type;
+        public int selectedWorldIndex;
     }
 
     internal class CustomWorldWindowData
@@ -19,12 +28,15 @@ namespace Refsa.CustomWorld.Editor
         public string wantedWorldType;
         public string addNewWorldTypeEnum;
         public string newWorldTemplate;
-        public List<string> availableWorldTypes;
         public string projectPath;
         public string packagePath;
         public Type bootstrapType;
 
         public List<WorldTypeData> worldTypeData;
+        public List<SystemData> systemDatas;
+        public List<string> worldTypeEnums;
+
+        public Queue<SystemData> systemsToChange;
     }
 
     internal class CustomWorldWindow : ModalWindow<CustomWorldWindowData>
@@ -66,6 +78,7 @@ namespace Refsa.CustomWorld.Editor
         void SetupData()
         {
             data = new CustomWorldWindowData();
+            data.systemsToChange = new Queue<SystemData>();
             
             OnSelectionChanged();
             SetupNewWorldTemplatePath();
@@ -73,7 +86,9 @@ namespace Refsa.CustomWorld.Editor
             isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out data.bootstrapType);
             if (isBaseSetup)
             {
+                SetupWorldTypeEnums();
                 SetupWorldTypeData();
+                SetupSystemTypeData();
             }
         }
 
@@ -97,6 +112,48 @@ namespace Refsa.CustomWorld.Editor
                         className = name + "Class"
                     }
                 );
+            }
+        }
+
+        void SetupSystemTypeData()
+        {
+            data.systemDatas = new List<SystemData>();
+
+            Type enumType = data.bootstrapType.BaseType.GetGenericArguments()[0];
+            Type attributeType = data.bootstrapType.BaseType.GetGenericArguments()[1];
+            var getAllSystems = typeof(CustomWorldHelpers).GetMethod("GetAllSystemsDirect").MakeGenericMethod(enumType, attributeType);
+
+            int index = 0;
+            foreach (Enum enumValue in System.Enum.GetValues(enumType))
+            {
+                var relatedSystems = (IReadOnlyList<Type>) getAllSystems.Invoke(null, new object[] {WorldSystemFilterFlags.Default, enumValue, false});
+                foreach (var relatedSystem in relatedSystems)
+                {
+                    if (relatedSystem.AssemblyQualifiedName.Contains("Unity")) continue;
+
+                    data.systemDatas.Add(
+                        new SystemData
+                        {
+                            name = relatedSystem.Name,
+                            world = enumValue.ToString(),
+                            type = relatedSystem,
+                            selectedWorldIndex = index
+                        }
+                    );
+                }
+                index++;
+            }
+            
+        }
+
+        void SetupWorldTypeEnums()
+        {
+            data.worldTypeEnums = new List<string>();
+
+            Type enumType = data.bootstrapType.BaseType.GetGenericArguments()[0];
+            foreach (Enum enumValue in System.Enum.GetValues(enumType))
+            {
+                data.worldTypeEnums.Add(enumValue.ToString());
             }
         }
 #endregion
@@ -182,8 +239,42 @@ namespace Refsa.CustomWorld.Editor
                     }
                 }
                 GUILayout.EndVertical();
+
+                EditorGUILayout.Space(20);
+
+                using (new GUILayout.VerticalScope())
+                {
+                    using (new GUILayout.HorizontalScope())
+                    {
+                        EditorGUILayout.LabelField("World", GUILayout.Width(100));
+                        EditorGUILayout.LabelField("System");
+                        EditorGUILayout.LabelField("Type");
+                    }
+                    for (int i = 0; i < data.systemDatas.Count; i++)
+                    {
+                        var system = data.systemDatas[i];
+                        using (new GUILayout.HorizontalScope())
+                        {
+                            // EditorGUILayout.LabelField($"{system.world}", GUILayout.Width(100));
+                            int index = EditorGUILayout.Popup(system.selectedWorldIndex, data.worldTypeEnums.ToArray(), GUILayout.Width(100));
+                            EditorGUILayout.LabelField($"{system.name}");
+                            EditorGUILayout.LabelField($"{system.type.AssemblyQualifiedName}");
+
+                            if (index != system.selectedWorldIndex)
+                            {
+                                system.selectedWorldIndex = index;
+                                data.systemsToChange.Enqueue(system);
+                            }
+                        }
+                    }
+                }
             }
             GUILayout.EndVertical();
+
+            if (data.systemsToChange.Count != 0)
+            {
+                ChangeSystems();
+            }
         }
 #endregion
 
@@ -204,6 +295,7 @@ namespace Refsa.CustomWorld.Editor
         void ScriptsReloaded()
         {
             data = new CustomWorldWindowData();
+            data.systemsToChange = new Queue<SystemData>();
             data.packagePath = EditorPrefs.GetString("com.refsa.customworld.packagePath");
             data.projectPath = EditorPrefs.GetString("com.refsa.customworld.projectPath");
 
@@ -216,7 +308,9 @@ namespace Refsa.CustomWorld.Editor
 
             if (isBaseSetup)
             {
+                SetupWorldTypeEnums();
                 SetupWorldTypeData();
+                SetupSystemTypeData();
             }
         }
 #endregion
@@ -400,6 +494,50 @@ namespace Refsa.CustomWorld.Editor
             }
 
             data.newWorldTemplate = newWorldContents;
+        }
+
+        void ChangeSystems()
+        {
+            while (data.systemsToChange.Count > 0)
+            {
+                var current = data.systemsToChange.Dequeue();
+                string newWorldType = data.worldTypeEnums[current.selectedWorldIndex];
+
+                string filePath = CustomWorldsEditorHelpers.FindFileInProject(current.name + ".cs");
+                string fileContent = "";
+                using (var file = File.OpenText(filePath))
+                {
+                    fileContent = file.ReadToEnd();
+                }
+
+                if (current.world == "Default")
+                {
+                    if (fileContent.IndexOf($"[CustomWorldType(CustomWorldType.{newWorldType})]") != -1) return;
+
+                    int insertIndex = fileContent.IndexOf($"public class {current.name}");
+                    string newContent = $"[CustomWorldType(CustomWorldType.{newWorldType})]\n";
+                    fileContent = fileContent.Insert(insertIndex, newContent);
+                }
+                else
+                {
+                    if (newWorldType == "Default")
+                    {
+                        fileContent = fileContent.Replace($"\n[CustomWorldType(CustomWorldType.{current.world})]", "");
+                    }
+                    else
+                    {
+
+                    }
+                }
+
+                using (var file = File.CreateText(filePath))
+                {
+                    file.Write(fileContent);
+                }
+
+                current.world = newWorldType;
+                AssetDatabase.Refresh();
+            }
         }
     }
 }
