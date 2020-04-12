@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<engine:UXML
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:engine="UnityEngine.UIElements"
+    xmlns:editor="UnityEditor.UIElements">
+    xsi:noNamespaceSchemaLocation="../../../UIElementsSchema/UIElements.xsd"
+    xsi:schemaLocation="
+        UnityEngine.UIElements ../../../UIElementsSchema/UnityEngine.UIElements.xsd
+        UnityEditor.UIElements ../../../UIElementsSchema/UnityEditor.UIElements.xsd
+        UnityEngine.PackageManager.UI ../../../UIElementsSchema/UnityEditor.PackageManager.UI.xsd"
+>
+
+    <engine:VisualElement class="WorldTypeView">
+        <editor:EnumField type="CustomWorldType, Assembly-CSharp" value="Default" class="WorldTypeEnum" />
+        <engine:Label text="System Class" class="SystemName" />
+    </engine:VisualElement>
+
+</engine:UXML>

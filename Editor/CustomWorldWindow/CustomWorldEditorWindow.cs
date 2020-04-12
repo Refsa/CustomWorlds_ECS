@@ -4,7 +4,9 @@ using System.IO;
 using System.Linq;
 using Unity.Entities;
 using UnityEditor;
+using UnityEditor.UIElements;
 using UnityEngine;
+using UnityEngine.UIElements;
 
 namespace Refsa.CustomWorld.Editor
 {   
@@ -18,9 +20,8 @@ namespace Refsa.CustomWorld.Editor
     internal class SystemData
     {
         public string name;
-        public string world;
         public Type type;
-        public int selectedWorldIndex;
+        public Enum worldEnum;
     }
 
     internal class CustomWorldWindowData
@@ -35,50 +36,126 @@ namespace Refsa.CustomWorld.Editor
         public List<WorldTypeData> worldTypeData;
         public List<SystemData> systemDatas;
         public List<string> worldTypeEnums;
-
-        public Queue<SystemData> systemsToChange;
     }
 
-    internal class CustomWorldWindow : ModalWindow<CustomWorldWindowData>
+    internal class CustomWorldWindow : EditorWindow
     {
         int index = -1;
         bool isBaseSetup = false;
 
-#region SETUP
-        public static CustomWorldWindow Create()
-        {
+        CustomWorldWindowData data;
 
-            var window = CustomWorldWindow.CreateInstance<CustomWorldWindow>();
-            window.minSize = new Vector2(600, 400);
-            // window.maxSize = new Vector2(400, 400);
+        VisualTreeAsset worldTypeViewUxml;
+        VisualTreeAsset systemInfoViewUxml;
+
+        VisualElement worldTypeContainer;
+        VisualElement systemInfoContainer;
+
+        public static void Create()
+        {
+            var window = GetWindow<CustomWorldWindow>();
+
+            window.minSize = new Vector2(800, 600);
+            window.maxSize = new Vector2(800, 600);
+
             window.titleContent = new GUIContent("Custom World Editor");
-
-            window.showOKButton = false;
-            window.cancelText = "Close";
-
-            window.SetupData();
-
-            window.Show();
-            return window;
         }
 
-        protected override void Cancel()
+        private void OnEnable() 
         {
-            requestClose = true;
+            UnityEngine.Debug.Log($"Window OnEnable");
+            SetupData();
+            SetupView();
+
+            Selection.selectionChanged += OnSelectionChanged;
         }
 
-        protected override void OK()
+		private void OnDisable() 
         {
-            requestClose = true;
+            UnityEngine.Debug.Log($"Window OnDisable"); 
+
+            Selection.selectionChanged -= OnSelectionChanged;
         }
 
+#region VIEW
+		void SetupView()
+		{
+			var baseUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/BaseWindow.uxml");
+                
+            var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>
+                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/USS/BaseStyle.uss");
+
+            baseUxml.CloneTree(rootVisualElement);
+            rootVisualElement.styleSheets.Add(uss);
+
+            worldTypeViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/WorldTypeView.uxml");
+
+            systemInfoViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/SystemInfoView.uxml");
+
+            worldTypeContainer = rootVisualElement.Query("WorldTypeInnerContainer").First();
+            systemInfoContainer = rootVisualElement.Query("SystemInfoContainer").First();
+
+            for (int i = 0; i < data.worldTypeData.Count; i++)
+            {
+                AddNewWorldTypeView(data.worldTypeData[i]);
+            }
+
+            for (int i = 0; i < data.systemDatas.Count; i++)
+            {
+                var system = data.systemDatas[i];
+                AddNewSystemInfoView(system);
+            }
+
+			var addWorldTextInput = rootVisualElement.Query("AddWorldNameInput").First() as TextField;
+			(rootVisualElement.Query("AddWorldSubmit").First() as Button).clicked +=
+				() => {
+					data.addNewWorldTypeEnum = addWorldTextInput.value;
+					AddWorld();
+				};
+		}
+
+        void AddNewWorldTypeView(WorldTypeData data)
+        {
+            var newElement = worldTypeViewUxml.CloneTree();
+
+            (newElement.Query(null, "WorldName").First() as Label).text = data.name;
+            (newElement.Query(null, "WorldClass").First() as Label).text = data.className;
+
+            (newElement.Query(null, "WorldRemove").First() as Button).clicked += 
+                () => {
+                    this.data.wantedWorldType = data.name;
+                    RemoveWorld();
+                };
+
+            worldTypeContainer.Add(newElement);
+        }
+
+        void AddNewSystemInfoView(SystemData systemData)
+        {
+            var newElement = systemInfoViewUxml.CloneTree();
+
+            (newElement.Query(null, "SystemName").First() as Label).text = systemData.name;
+
+            var enumField = (newElement.Query(null, "WorldTypeEnum").First() as EnumField);
+            enumField.value = systemData.worldEnum;
+            enumField.RegisterValueChangedCallback(e => {
+                ChangeSystem(systemData, e.previousValue, e.newValue);
+            });
+
+            systemInfoContainer.Add(newElement);
+        }
+#endregion
+
+#region SETUP
         /// <summary>
         /// Sets up required data from a fresh window
         /// </summary>
         void SetupData()
         {
             data = new CustomWorldWindowData();
-            data.systemsToChange = new Queue<SystemData>();
             
             OnSelectionChanged();
             SetupNewWorldTemplatePath();
@@ -135,9 +212,8 @@ namespace Refsa.CustomWorld.Editor
                         new SystemData
                         {
                             name = relatedSystem.Name,
-                            world = enumValue.ToString(),
                             type = relatedSystem,
-                            selectedWorldIndex = index
+                            worldEnum = enumValue
                         }
                     );
                 }
@@ -154,126 +230,6 @@ namespace Refsa.CustomWorld.Editor
             foreach (Enum enumValue in System.Enum.GetValues(enumType))
             {
                 data.worldTypeEnums.Add(enumValue.ToString());
-            }
-        }
-#endregion
-
-#region DRAW
-        protected override void Draw()
-        {
-            if (!isBaseSetup)
-            {
-                DrawSetupBootstrap();
-            }
-            else
-            {
-                DrawAddWorlds();
-            }
-        }
-
-        void DrawSetupBootstrap()
-        {
-            GUILayout.BeginVertical();
-            {
-                if (GUILayout.Button("Setup Bootstrap"))
-                {
-                    data.bootstrapType = CustomWorldsEditorHelpers.SetupBaseBootstrap();
-                }
-            }
-            GUILayout.EndVertical();
-        }
-
-        void DrawAddWorlds()
-        {
-            GUILayout.BeginVertical(GUILayout.Width(position.width));
-            {
-                GUILayout.BeginVertical();
-                {
-                    GUILayout.BeginHorizontal();
-                    {
-                        EditorGUILayout.LabelField("Enum Name", GUILayout.Width(position.width / 3f));
-                        EditorGUILayout.LabelField("Class Name", GUILayout.Width(position.width / 3f));
-                        EditorGUILayout.LabelField("Action", GUILayout.Width(position.width / 3f));
-                    }
-                    GUILayout.EndHorizontal();
-
-                    foreach (var worldTypeData in data.worldTypeData)
-                    {
-                        GUILayout.BeginHorizontal();
-
-                        EditorGUILayout.LabelField(worldTypeData.name, GUILayout.Width(position.width / 3f));
-
-                        if (!worldTypeData.classExists)
-                        {
-                            EditorGUILayout.LabelField("NULL", GUILayout.Width(position.width / 3f));
-                            if (GUILayout.Button("Create Class", GUILayout.Width(position.width / 3f)))
-                            {
-                                data.wantedWorldType = worldTypeData.name;
-                                AddNewWorld();
-                            }
-                        }
-                        else
-                        {
-                            EditorGUILayout.LabelField(worldTypeData.className, GUILayout.Width(position.width / 3f));
-                            if (GUILayout.Button("Remove", GUILayout.Width(position.width / 3f)))
-                            {
-                                data.wantedWorldType = worldTypeData.name;
-                                RemoveWorld();
-                            }
-                        }
-
-                        GUILayout.EndHorizontal();
-                    }
-                }
-                GUILayout.EndVertical();
-
-                EditorGUILayout.Space(20);
-
-                GUILayout.BeginVertical();
-                {
-                    data.addNewWorldTypeEnum = EditorGUILayout.TextField("New World Type", data.addNewWorldTypeEnum);
-                    if (GUILayout.Button("Add World Type"))
-                    {
-                        // AddEnumEntry();
-                        AddWorld();
-                    }
-                }
-                GUILayout.EndVertical();
-
-                EditorGUILayout.Space(20);
-
-                using (new GUILayout.VerticalScope())
-                {
-                    using (new GUILayout.HorizontalScope())
-                    {
-                        EditorGUILayout.LabelField("World", GUILayout.Width(100));
-                        EditorGUILayout.LabelField("System");
-                        EditorGUILayout.LabelField("Type");
-                    }
-                    for (int i = 0; i < data.systemDatas.Count; i++)
-                    {
-                        var system = data.systemDatas[i];
-                        using (new GUILayout.HorizontalScope())
-                        {
-                            // EditorGUILayout.LabelField($"{system.world}", GUILayout.Width(100));
-                            int index = EditorGUILayout.Popup(system.selectedWorldIndex, data.worldTypeEnums.ToArray(), GUILayout.Width(100));
-                            EditorGUILayout.LabelField($"{system.name}");
-                            EditorGUILayout.LabelField($"{system.type.AssemblyQualifiedName}");
-
-                            if (index != system.selectedWorldIndex)
-                            {
-                                system.selectedWorldIndex = index;
-                                data.systemsToChange.Enqueue(system);
-                            }
-                        }
-                    }
-                }
-            }
-            GUILayout.EndVertical();
-
-            if (data.systemsToChange.Count != 0)
-            {
-                ChangeSystems();
             }
         }
 #endregion
@@ -295,7 +251,6 @@ namespace Refsa.CustomWorld.Editor
         void ScriptsReloaded()
         {
             data = new CustomWorldWindowData();
-            data.systemsToChange = new Queue<SystemData>();
             data.packagePath = EditorPrefs.GetString("com.refsa.customworld.packagePath");
             data.projectPath = EditorPrefs.GetString("com.refsa.customworld.projectPath");
 
@@ -303,8 +258,8 @@ namespace Refsa.CustomWorld.Editor
 
             SetupNewWorldTemplatePath();
 
-            Selection.selectionChanged -= OnSelectionChanged;
-            Selection.selectionChanged += OnSelectionChanged;
+            // Selection.selectionChanged -= OnSelectionChanged;
+            // Selection.selectionChanged += OnSelectionChanged;
 
             if (isBaseSetup)
             {
@@ -385,16 +340,22 @@ namespace Refsa.CustomWorld.Editor
         void RemoveEnumEntry(string enumEntryName)
         {
             string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
-            if (worldTypeEnumPath == null) return;
+            if (worldTypeEnumPath == null)
+            {
+                UnityEngine.Debug.LogError($"Couldn't find world type enum file (CustomWorldType.cs)");
+                return;
+            }
 
             string enumFileContents = "";
             using (var enumFile = File.OpenText(worldTypeEnumPath))
             {
                 enumFileContents = 
                     enumFile.ReadToEnd()
+                    .Replace("    " + enumEntryName + "\n", "")
+                    .Replace("    " + enumEntryName + ",\n", "")
                     .Replace("\t" + enumEntryName + "\n", "")
                     .Replace("\t" + enumEntryName + ",\n", "");
-            }
+			}
 
             using (var enumFile = File.CreateText(worldTypeEnumPath))
             {
@@ -466,10 +427,12 @@ namespace Refsa.CustomWorld.Editor
             string className = $"{data.wantedWorldType}World";
             string savePath = CustomWorldsEditorHelpers.FindFileInProject(className + ".cs");
 
-            if (savePath == null) return;
+            if (savePath != null) 
+            {
+                File.Delete(savePath);
+            }
 
             RemoveEnumEntry(data.wantedWorldType);
-            File.Delete(savePath);
 
             data.wantedWorldType = "";
             AssetDatabase.Refresh();
@@ -490,54 +453,48 @@ namespace Refsa.CustomWorld.Editor
             if (newWorldContents == "")
             {
                 UnityEngine.Debug.LogError($"Template file for new Custom Worlds not found");
-                Cancel();
             }
 
             data.newWorldTemplate = newWorldContents;
         }
 
-        void ChangeSystems()
+        void ChangeSystem(SystemData data, Enum oldValue, Enum newValue)
         {
-            while (data.systemsToChange.Count > 0)
+            string filePath = CustomWorldsEditorHelpers.FindFileInProject(data.name + ".cs");
+            string fileContent = "";
+            using (var file = File.OpenText(filePath))
             {
-                var current = data.systemsToChange.Dequeue();
-                string newWorldType = data.worldTypeEnums[current.selectedWorldIndex];
+                fileContent = file.ReadToEnd();
+            }
 
-                string filePath = CustomWorldsEditorHelpers.FindFileInProject(current.name + ".cs");
-                string fileContent = "";
-                using (var file = File.OpenText(filePath))
+            if (oldValue.ToString() == "Default")
+            {
+                if (fileContent.IndexOf($"[CustomWorldType(CustomWorldType.{newValue.ToString()})]") != -1) return;
+
+                int insertIndex = fileContent.IndexOf($"public class {data.name}");
+                string newContent = $"[CustomWorldType(CustomWorldType.{newValue.ToString()})]\n";
+                fileContent = fileContent.Insert(insertIndex, newContent);
+            }
+            else
+            {
+                if (newValue.ToString() == "Default")
                 {
-                    fileContent = file.ReadToEnd();
-                }
-
-                if (current.world == "Default")
-                {
-                    if (fileContent.IndexOf($"[CustomWorldType(CustomWorldType.{newWorldType})]") != -1) return;
-
-                    int insertIndex = fileContent.IndexOf($"public class {current.name}");
-                    string newContent = $"[CustomWorldType(CustomWorldType.{newWorldType})]\n";
-                    fileContent = fileContent.Insert(insertIndex, newContent);
+                    fileContent = fileContent.Replace($"\n[CustomWorldType(CustomWorldType.{oldValue.ToString()})]", "");
                 }
                 else
                 {
-                    if (newWorldType == "Default")
-                    {
-                        fileContent = fileContent.Replace($"\n[CustomWorldType(CustomWorldType.{current.world})]", "");
-                    }
-                    else
-                    {
 
-                    }
                 }
-
-                using (var file = File.CreateText(filePath))
-                {
-                    file.Write(fileContent);
-                }
-
-                current.world = newWorldType;
-                AssetDatabase.Refresh();
             }
+
+            using (var file = File.CreateText(filePath))
+            {
+                file.Write(fileContent);
+            }
+
+            data.worldEnum = newValue;
+
+            AssetDatabase.Refresh();
         }
     }
 }

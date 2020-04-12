@@ -12,6 +12,13 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - Added overview of systems and systemgroups to Custom World Editor Window
     - Adding in ability to set the attribute on classes through the editor tool
 
+### Changes
+- Rewriting Custom World editor window to UIElements
+
+### Future
+- Custom World editor window lacks toast message and additional barriers to protect
+removing worlds that are assigned to systems
+
 ## 1.1.2
 ### Changes
 - Cleaned up CustomWorldEditorWindow, removed unused functionality and added comments
@@ -31,7 +38,7 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - Fixed adding enum entry Linq Aggregate to property restructure file
 
 ### Known Issues
-- 
+- Sometimes when removing a World the enum entry doesn't get removed.
 
 ## 1.1.0
 ### Changes
