@@ -80,20 +80,28 @@ namespace Refsa.CustomWorld.Editor
 #region VIEW
 		void SetupView()
 		{
+			// TODO: Change path to retreive UXML/USS in package release
+
+			string packagePath = "Assets/Scripts/ECS/CustomWorld/Editor";
+			try 
+			{
+				packagePath = data.packagePath.Remove(0, data.packagePath.IndexOf("/Library/PackageCache/")).Remove(0, 1);
+			} catch {}
+
 			var baseUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/BaseWindow.uxml");
+                (packagePath + "/CustomWorldWindow/UXML/BaseWindow.uxml");
                 
             var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>
-                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/USS/BaseStyle.uss");
+                (packagePath + "/CustomWorldWindow/USS/BaseStyle.uss");
 
             baseUxml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(uss);
 
             worldTypeViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/WorldTypeView.uxml");
+                (packagePath + "/CustomWorldWindow/UXML/WorldTypeView.uxml");
 
             systemInfoViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
-                ("Assets/Scripts/ECS/CustomWorld/Editor/CustomWorldWindow/UXML/SystemInfoView.uxml");
+                (packagePath + "/CustomWorldWindow/UXML/SystemInfoView.uxml");
 
             worldTypeContainer = rootVisualElement.Query("WorldTypeInnerContainer").First();
             systemInfoContainer = rootVisualElement.Query("SystemInfoContainer").First();

@@ -7,6 +7,10 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.2.1
+### Fixes
+- Fixed retreiving UXML and USS when library is used as package
+
 ## 1.2.0
 ### Added
 - Added overview of systems and systemgroups to Custom World Editor Window
