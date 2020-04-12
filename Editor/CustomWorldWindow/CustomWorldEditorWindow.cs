@@ -56,7 +56,7 @@ namespace Refsa.CustomWorld.Editor
             var window = GetWindow<CustomWorldWindow>();
 
             window.minSize = new Vector2(800, 600);
-            window.maxSize = new Vector2(800, 600);
+            window.maxSize = new Vector2(1600, 1000);
 
             window.titleContent = new GUIContent("Custom World Editor");
         }

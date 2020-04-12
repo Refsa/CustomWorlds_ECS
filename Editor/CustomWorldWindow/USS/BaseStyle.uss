@@ -80,13 +80,6 @@
     border-color: #6F845D;
 }
 
-#AddNewWorldContainer {
-    height: 10%;
-    display: flex;
-    flex-direction: column;
-    flex-shrink: 0;
-}
-
 #ExistingWorldsContainer {
     height: 90%;
     display: flex;
@@ -132,12 +125,22 @@
     width: 5%;
 }
 
-#AddWorldContainer {
+#AddNewWorldContainer {
+    height: 60px;
+    width: auto;
+    display: flex;
+    flex-direction: column;
     flex-shrink: 0;
-    margin-top: 2%;
-    margin-bottom: 2%;
+}
+
+#AddWorldContainer {
+    width: 100%;
+    flex-shrink: 0;
+    margin: auto;
     display: flex;
     flex-direction: row;
+    flex-shrink: 0;
+    flex-grow: 0;
 }
 
 #AddWorldContainer TextField {
@@ -146,8 +149,6 @@
 }
 
 #AddWorldContainer Button {
-    position: absolute;
-    right: 5%;
     width: 20%;
 }
 
