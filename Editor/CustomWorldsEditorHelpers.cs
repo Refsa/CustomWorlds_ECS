@@ -217,9 +217,13 @@ namespace Refsa.CustomWorld.Editor
 
             if (!foundPackagePath)
             {
-                UnityEngine.Debug.LogError($"Could not find Package path for com.refsa.customworld");
                 // currentPath = Application.dataPath + "/Scripts/ECS/CustomWorld/Editor";
+
                 currentPath = "Assets/Scripts/ECS/CustomWorld/Editor";
+                if (!Directory.Exists(Application.dataPath.Replace("Assets/", currentPath)))
+                {
+                    UnityEngine.Debug.LogError($"Could not find Package path for com.refsa.customworld");
+                }
             }
 
             return currentPath;

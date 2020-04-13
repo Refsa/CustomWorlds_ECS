@@ -63,7 +63,6 @@ namespace Refsa.CustomWorld.Editor
 
         private void OnEnable() 
         {
-            UnityEngine.Debug.Log($"Window OnEnable");
             SetupData();
             SetupView();
 
@@ -72,8 +71,6 @@ namespace Refsa.CustomWorld.Editor
 
 		private void OnDisable() 
         {
-            UnityEngine.Debug.Log($"Window OnDisable"); 
-
             Selection.selectionChanged -= OnSelectionChanged;
         }
 
@@ -219,6 +216,9 @@ namespace Refsa.CustomWorld.Editor
             }
         }
 
+		/// <summary>
+		/// Retreives classes derived from ComponentSystemBase
+		/// </summary>
         void SetupSystemTypeData()
         {
             data.systemDatas = new List<SystemData>();
@@ -249,6 +249,9 @@ namespace Refsa.CustomWorld.Editor
             
         }
 
+		/// <summary>
+		/// Retreives the enum names from CustomWorldType enum
+		/// </summary>
         void SetupWorldTypeEnums()
         {
             data.worldTypeEnums = new List<string>();
@@ -284,9 +287,6 @@ namespace Refsa.CustomWorld.Editor
             isBaseSetup = CustomWorldsEditorHelpers.IsBaseSetup(out data.bootstrapType);
 
             SetupNewWorldTemplatePath();
-
-            // Selection.selectionChanged -= OnSelectionChanged;
-            // Selection.selectionChanged += OnSelectionChanged;
 
             if (isBaseSetup)
             {
