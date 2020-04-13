@@ -106,7 +106,7 @@ namespace Refsa.CustomWorld.Editor
 			toastMessageViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
                 	(data.packagePath + "/CustomWorldWindow/UXML/ToastMessageView.uxml");
 
-			AddNewToastMessage("Some Toast Message", ToastMessageStatus.Ok);
+			// AddNewToastMessage("Some Toast Message", ToastMessageStatus.Ok);
 
 			if (isBaseSetup)
 			{
@@ -432,10 +432,11 @@ namespace Refsa.CustomWorld.Editor
         /// Adds a new entry to the CustomWorldType enum
         /// </summary>
         /// <returns>true if a new entry was added</returns>
-        bool AddEnumEntry()
+        bool AddEnumEntry(out string feedbackMessage)
         {
             if (data.addNewWorldTypeEnum == null || data.addNewWorldTypeEnum == "") 
             {
+				feedbackMessage = "New World Type name is empty";
                 return false;
             }
 
@@ -444,12 +445,17 @@ namespace Refsa.CustomWorld.Editor
                 if (data.addNewWorldTypeEnum == name)
                 {
                     data.addNewWorldTypeEnum = "";
+					feedbackMessage = $"World Type of name {data.addNewWorldTypeEnum} already exists";
                     return false;
                 }
             }
 
             string worldTypeEnumPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
-            if (worldTypeEnumPath == null) return false;
+            if (worldTypeEnumPath == null) 
+			{
+				feedbackMessage = "Could not find CustomWorldType.cs in project";
+				return false;
+			}
 
             List<string> enumFileContents = new List<string>();
             using (var enumFile = File.OpenText(worldTypeEnumPath))
@@ -474,6 +480,7 @@ namespace Refsa.CustomWorld.Editor
             data.addNewWorldTypeEnum = "";
             AssetDatabase.Refresh();
 
+			feedbackMessage = "New World Type enum entry was made";
             return true;
         }
 
@@ -516,12 +523,15 @@ namespace Refsa.CustomWorld.Editor
         void AddWorld()
         {
             data.wantedWorldType = data.addNewWorldTypeEnum;
-            if (AddEnumEntry())
+            if (AddEnumEntry(out string feedbackMessage))
             {
-                AddNewWorld();
+				AddNewToastMessage(feedbackMessage, ToastMessageStatus.Ok);
+                AddNewWorld(out feedbackMessage);
+				AddNewToastMessage(feedbackMessage, ToastMessageStatus.Ok);
             }
             else
             {
+				AddNewToastMessage(feedbackMessage, ToastMessageStatus.Error);
                 data.wantedWorldType = "";
             }
         }
@@ -529,10 +539,11 @@ namespace Refsa.CustomWorld.Editor
         /// <summary>
         /// Adds a new world from the enum name in data.wantedWorldType
         /// </summary>
-        void AddNewWorld()
+        void AddNewWorld(out string feedbackMessage)
         {
             if (data.wantedWorldType == null || data.wantedWorldType == "")
             {
+				feedbackMessage = "Wanted world type was empty";
                 return;
             }
 
@@ -557,6 +568,8 @@ namespace Refsa.CustomWorld.Editor
             }
 
             data.wantedWorldType = "";
+			feedbackMessage = "New World class was added";
+
             AssetDatabase.Refresh();
         }
 
@@ -574,9 +587,11 @@ namespace Refsa.CustomWorld.Editor
             if (savePath != null) 
             {
                 File.Delete(savePath);
+				AddNewToastMessage($"Removed World class file: {className}", ToastMessageStatus.Ok);
             }
 
             RemoveEnumEntry(data.wantedWorldType);
+			AddNewToastMessage($"Removed World Type enum entry of name: {data.wantedWorldType}", ToastMessageStatus.Ok);
 
             data.wantedWorldType = "";
             AssetDatabase.Refresh();
@@ -635,6 +650,8 @@ namespace Refsa.CustomWorld.Editor
             {
                 file.Write(fileContent);
             }
+
+			AddNewToastMessage($"Changed World Type on system {data.name} from {oldValue} to {newValue}", ToastMessageStatus.Ok);
 
             data.worldEnum = newValue;
 

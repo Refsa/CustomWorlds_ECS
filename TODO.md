@@ -7,7 +7,9 @@ Editor:
             ☐ World already exist
             ☐ Invalid name
         ☐ Setting systems world type
-
+    ☐ Rename World
+        ☐ Recursively find all systems with the world type tag
+    ☐ Add multiple world types to systems
 
 Runtime:
 

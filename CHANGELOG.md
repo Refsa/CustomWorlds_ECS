@@ -13,6 +13,10 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - Adding toast messages to display feedback messages
 - Added simple animation helpers using editor coroutines to allow easier animation
 of Editor UIElements
+- Added feedback messages to display in the toast message popup. 
+    - Feedback for adding worlds
+    - Feedback for removing worlds
+    - Feedback for changing system world type
 
 ## 1.2.3
 ### Added
