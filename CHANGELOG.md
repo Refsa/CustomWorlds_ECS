@@ -7,6 +7,13 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.3.0
+### Added
+- Added com.unity.editorcoroutines package to dependencies
+- Adding toast messages to display feedback messages
+- Added simple animation helpers using editor coroutines to allow easier animation
+of Editor UIElements
+
 ## 1.2.3
 ### Added
 - Window can now be resized between (800, 600) and (1600, 1000)

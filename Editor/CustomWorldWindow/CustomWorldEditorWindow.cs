@@ -7,6 +7,9 @@ using UnityEditor;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.UIElements;
+using Unity.EditorCoroutines;
+using Unity.EditorCoroutines.Editor;
+using System.Collections;
 
 namespace Refsa.CustomWorld.Editor
 {   
@@ -47,9 +50,12 @@ namespace Refsa.CustomWorld.Editor
 
         VisualTreeAsset worldTypeViewUxml;
         VisualTreeAsset systemInfoViewUxml;
+		VisualTreeAsset toastMessageViewUxml;
 
         VisualElement worldTypeContainer;
         VisualElement systemInfoContainer;
+
+		List<EditorCoroutine> activeCoroutines;
 
         public static void Create()
         {
@@ -63,6 +69,8 @@ namespace Refsa.CustomWorld.Editor
 
         private void OnEnable() 
         {
+			activeCoroutines = new List<EditorCoroutine>();
+
             SetupData();
             SetupView();
 
@@ -72,6 +80,14 @@ namespace Refsa.CustomWorld.Editor
 		private void OnDisable() 
         {
             Selection.selectionChanged -= OnSelectionChanged;
+
+			foreach (var coroutine in activeCoroutines)
+			{
+				if (coroutine != null)
+				{
+					EditorCoroutineUtility.StopCoroutine(coroutine);
+				}
+			}
         }
 
 #region VIEW
@@ -86,6 +102,11 @@ namespace Refsa.CustomWorld.Editor
 
             baseUxml.CloneTree(rootVisualElement);
             rootVisualElement.styleSheets.Add(uss);
+
+			toastMessageViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
+                	(data.packagePath + "/CustomWorldWindow/UXML/ToastMessageView.uxml");
+
+			AddNewToastMessage("Some Toast Message", ToastMessageStatus.Ok);
 
 			if (isBaseSetup)
 			{
@@ -171,6 +192,102 @@ namespace Refsa.CustomWorld.Editor
 
             systemInfoContainer.Add(newElement);
         }
+
+		enum ToastMessageStatus {
+			Ok,
+			Error
+		}
+		float toastInAnimationTime;
+		void AddNewToastMessage(string message, ToastMessageStatus status)
+		{
+			var toastMessageElement = toastMessageViewUxml.CloneTree();
+			toastMessageElement.AddToClassList("ToastTemplateContainer");
+
+			(toastMessageElement.Query("ToastMessageText").First() as Label).text = message;
+
+			rootVisualElement.Add(toastMessageElement);
+
+			var toastMessageContainer = toastMessageElement.Query(null, "ToastMessageContainer").First();
+			var toastMessageText = toastMessageElement.Query("ToastMessageText").First();
+
+			float easeInTime = 1f;
+
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BackgroundColorEase))
+			);
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BorderColorEase))
+			);
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseIn(toastMessageText, easeInTime, UIElementsAnimation.ColorEase)
+				)
+			);
+
+			activeCoroutines.Add(
+				this.StartCoroutine(RunActionAfter(toastMessageElement, 5f, ToastEaseOutAndDestroy))
+			);
+		}
+
+		void ToastEaseOutAndDestroy(VisualElement element)
+		{
+			var toastMessageContainer = element.Query(null, "ToastMessageContainer").First();
+			var toastMessageText = element.Query("ToastMessageText").First();
+			float easeOutTime = 1f;
+
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BackgroundColorEase))
+			);
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BorderColorEase))
+			);
+			activeCoroutines.Add(
+				this.StartCoroutine(
+					UIElementsAnimation.AnimationEaseOut(toastMessageText, easeOutTime, UIElementsAnimation.ColorEase)
+				)
+			);
+
+			activeCoroutines.Add(
+				this.StartCoroutine(RemoveElementAfter(element, easeOutTime * 1.1f))
+			);
+		}
+
+		IEnumerator RunActionAfter(VisualElement element, float time, Action<VisualElement> action)
+		{
+			double startTime = EditorApplication.timeSinceStartup;
+			float animTime = UIElementsAnimation.AnimationTime(startTime, time);
+
+			while (animTime < 1f)
+			{
+				animTime = UIElementsAnimation.AnimationTime(startTime, time);
+				yield return null;
+			}
+
+			// rootVisualElement.Remove(element);
+			action?.Invoke(element);
+
+			yield break;
+		}
+
+		IEnumerator RemoveElementAfter(VisualElement element, float time)
+		{
+			double startTime = EditorApplication.timeSinceStartup;
+			float animTime = UIElementsAnimation.AnimationTime(startTime, time);
+
+			while (animTime < 1f)
+			{
+				animTime = UIElementsAnimation.AnimationTime(startTime, time);
+				yield return null;
+			}
+
+			rootVisualElement.Remove(element);
+			yield break;
+		}
+		
 #endregion
 
 #region SETUP

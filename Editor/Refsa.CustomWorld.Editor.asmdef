@@ -2,7 +2,8 @@
     "name": "Refsa.CustomWorld.Editor",
     "references": [
         "GUID:4eb94ae255c0a6f4caf53cf3aef62c42",
-        "GUID:734d92eba21c94caba915361bd5ac177"
+        "GUID:734d92eba21c94caba915361bd5ac177",
+        "GUID:478a2357cc57436488a56e564b08d223"
     ],
     "includePlatforms": [],
     "excludePlatforms": [],

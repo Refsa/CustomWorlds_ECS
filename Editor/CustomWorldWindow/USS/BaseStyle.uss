@@ -8,6 +8,8 @@
     192B35
 */
 
+/* General */
+
 .FlexTemplateContainer {
     width: 100%;
     height: 100%;
@@ -39,7 +41,7 @@
     color: #F7EFCA;
 }
 
-
+/* Title Bar */
 
 #TitleBar {
     height: 30px;
@@ -59,7 +61,7 @@
     color: #F7EFCA;
 }
 
-
+/* Main Container */
 
 #MainContainer {
     background-color: #101c20;
@@ -69,7 +71,7 @@
     flex-direction: row;
 }
 
-
+/* Left Container */
 
 #LeftContainer {
     background-color: #101c20;
@@ -163,7 +165,7 @@
     border-color: #6F845D;
 }
 
-
+/* Right Container */
 
 #RightContainer {
     background-color: #101c20;
@@ -187,13 +189,6 @@
     flex-shrink: 0;
 }
 
-/* #SystemInfoTitle Label {
-    align-self: center;
-    color: #F7EFCA;
-    font-size: 12px;
-    margin-left: 4px;
-} */
-
 .AlignTextCenter {
     align-self: center;
 }
@@ -208,4 +203,51 @@
 .SystemName {
     width: 75%;
     color: #F7EFCA;
+}
+
+/* Toast Message */
+
+.ToastTemplateContainer {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    align-self: center;
+
+    bottom: 5px;
+    left: 50%;
+
+    position: absolute;
+
+    display: flex;
+}
+
+.ToastMessageContainer {
+    display: flex;
+    flex-direction: row;
+
+    position: absolute;
+    min-width: auto;
+    min-height: auto;
+
+    height: 30px;
+    width: 400px;
+
+    border-width: 1px;
+    border-color: #6F845D;
+    background-color: #192B35;
+    
+    /* border-color: transparent; */
+    /* background-color: transparent; */
+    /* background-color: rgba(255, 255, 255, 0.5); */
+    --toast-background-color: #192B35;
+}
+
+#ToastMessageText {
+    color: #F7EFCA;
+    align-self: center;
+    margin: auto auto;
+    font-size: 14px;
+
+    /* color: transparent; */
 }
