@@ -36,6 +36,8 @@ namespace Refsa.CustomWorld.Editor
         public string packagePath;
         public Type bootstrapType;
 
+		public Enum defaultWorldType;
+
         public List<WorldTypeData> worldTypeData;
         public List<SystemData> systemDatas;
         public List<string> worldTypeEnums;
@@ -387,6 +389,8 @@ namespace Refsa.CustomWorld.Editor
             {
                 data.worldTypeEnums.Add(enumValue.ToString());
             }
+
+			data.defaultWorldType = (Enum) System.Enum.GetValues(enumType).GetValue(0);
         }
 #endregion
 
@@ -557,11 +561,7 @@ namespace Refsa.CustomWorld.Editor
                 return;
             }
 
-            /* string projectPath = CustomWorldsEditorHelpers.FindFileInProject("CustomWorldType.cs");
-            if (projectPath == null) return;
-            data.projectPath = Path.GetDirectoryName(projectPath); */
             string projectPath = data.projectPath;
-
             string className = $"{data.wantedWorldType}World";
             string savePath = data.projectPath + $"/{className}.cs";
 
@@ -583,6 +583,8 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
+		int verifyCount = 0;
+
         /// <summary>
         /// Removes a world.
         /// 
@@ -590,6 +592,29 @@ namespace Refsa.CustomWorld.Editor
         /// </summary>
         void RemoveWorld()
         {
+			if (data.systemDatas.Find(e => e.worldEnum.ToString() == data.wantedWorldType) != null)
+			{
+				if (verifyCount == 0)
+				{
+					AddNewToastMessage($"Systems with the world tag {data.wantedWorldType} exists, want to remove anyways?", ToastMessageStatus.Error);
+					verifyCount++;
+					return;
+				}
+				else
+				{
+					data.systemDatas
+					.FindAll(e => e.worldEnum.ToString() == data.wantedWorldType)
+					.ForEach(
+						(sd) => {
+
+							ChangeSystem(sd, sd.worldEnum, data.defaultWorldType);
+						}
+					);
+
+					verifyCount = 0;
+				}
+			}
+
             string projectPath = data.projectPath;
             string className = $"{data.wantedWorldType}World";
             string savePath = CustomWorldsEditorHelpers.FindFileInProject(className + ".cs");

@@ -7,6 +7,12 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.4.0
+### Added
+- When removing a world type from the editor window it will now check for existing systems
+with the world tag before removing it. Clicking the X button twice will remove the tags on relevant
+systems and then remove the world type.
+
 ## 1.3.1
 ### Fixed
 - Previous version broke flex-shrink on some elements in the editor window, this is now fixed
