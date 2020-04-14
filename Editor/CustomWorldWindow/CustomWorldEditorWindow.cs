@@ -52,6 +52,8 @@ namespace Refsa.CustomWorld.Editor
         VisualTreeAsset systemInfoViewUxml;
 		VisualTreeAsset toastMessageViewUxml;
 
+		StyleSheet mainStyleUss;
+
         VisualElement worldTypeContainer;
         VisualElement systemInfoContainer;
 
@@ -77,7 +79,7 @@ namespace Refsa.CustomWorld.Editor
             Selection.selectionChanged += OnSelectionChanged;
         }
 
-		private void OnDisable() 
+		private void OnDisable()
         {
             Selection.selectionChanged -= OnSelectionChanged;
 
@@ -97,11 +99,11 @@ namespace Refsa.CustomWorld.Editor
 			var baseUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
                 (data.packagePath + "/CustomWorldWindow/UXML/BaseWindow.uxml");
                 
-            var uss = AssetDatabase.LoadAssetAtPath<StyleSheet>
+            mainStyleUss = AssetDatabase.LoadAssetAtPath<StyleSheet>
                 (data.packagePath + "/CustomWorldWindow/USS/BaseStyle.uss");
 
             baseUxml.CloneTree(rootVisualElement);
-            rootVisualElement.styleSheets.Add(uss);
+            rootVisualElement.styleSheets.Add(mainStyleUss);
 
 			toastMessageViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
                 	(data.packagePath + "/CustomWorldWindow/UXML/ToastMessageView.uxml");
@@ -166,6 +168,8 @@ namespace Refsa.CustomWorld.Editor
         {
             var newElement = worldTypeViewUxml.CloneTree();
 
+            worldTypeContainer.Add(newElement);
+
             (newElement.Query(null, "WorldName").First() as Label).text = data.name;
             (newElement.Query(null, "WorldClass").First() as Label).text = data.className;
 
@@ -174,8 +178,6 @@ namespace Refsa.CustomWorld.Editor
                     this.data.wantedWorldType = data.name;
                     RemoveWorld();
                 };
-
-            worldTypeContainer.Add(newElement);
         }
 
         void AddNewSystemInfoView(SystemData systemData)
@@ -203,31 +205,34 @@ namespace Refsa.CustomWorld.Editor
 			var toastMessageElement = toastMessageViewUxml.CloneTree();
 			toastMessageElement.AddToClassList("ToastTemplateContainer");
 
-			(toastMessageElement.Query("ToastMessageText").First() as Label).text = message;
-
 			rootVisualElement.Add(toastMessageElement);
 
 			var toastMessageContainer = toastMessageElement.Query(null, "ToastMessageContainer").First();
 			var toastMessageText = toastMessageElement.Query("ToastMessageText").First();
+			(toastMessageText as Label).text = message;
 
-			float easeInTime = 1f;
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-container-background-color"), out var containerColor);
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-container-border-color"), out var borderColor);
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-text-color"), out var textColor);
+
+			float easeInTime = 0.4f;
 
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BackgroundColorEase))
+					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BackgroundColorEase, containerColor))
 			);
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BorderColorEase))
+					UIElementsAnimation.AnimationEaseIn(toastMessageContainer, easeInTime, UIElementsAnimation.BorderColorEase, borderColor))
 			);
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseIn(toastMessageText, easeInTime, UIElementsAnimation.ColorEase)
+					UIElementsAnimation.AnimationEaseIn(toastMessageText, easeInTime, UIElementsAnimation.ColorEase, textColor)
 				)
 			);
 
 			activeCoroutines.Add(
-				this.StartCoroutine(RunActionAfter(toastMessageElement, 5f, ToastEaseOutAndDestroy))
+				this.StartCoroutine(RunActionAfter(toastMessageElement, 3f, ToastEaseOutAndDestroy))
 			);
 		}
 
@@ -235,19 +240,24 @@ namespace Refsa.CustomWorld.Editor
 		{
 			var toastMessageContainer = element.Query(null, "ToastMessageContainer").First();
 			var toastMessageText = element.Query("ToastMessageText").First();
-			float easeOutTime = 1f;
+
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-container-background-color"), out var containerColor);
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-container-border-color"), out var borderColor);
+			rootVisualElement.customStyle.TryGetValue(new CustomStyleProperty<Color>("--toast-text-color"), out var textColor);
+
+			float easeOutTime = 0.4f;
 
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BackgroundColorEase))
+					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BackgroundColorEase, containerColor))
 			);
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BorderColorEase))
+					UIElementsAnimation.AnimationEaseOut(toastMessageContainer, easeOutTime, UIElementsAnimation.BorderColorEase, borderColor))
 			);
 			activeCoroutines.Add(
 				this.StartCoroutine(
-					UIElementsAnimation.AnimationEaseOut(toastMessageText, easeOutTime, UIElementsAnimation.ColorEase)
+					UIElementsAnimation.AnimationEaseOut(toastMessageText, easeOutTime, UIElementsAnimation.ColorEase, textColor)
 				)
 			);
 
@@ -427,7 +437,8 @@ namespace Refsa.CustomWorld.Editor
             if (data.packagePath != "")
                 EditorPrefs.SetString("com.refsa.customworld.packagePath", data.packagePath);
         }
-        
+    
+#region Utility
         /// <summary>
         /// Adds a new entry to the CustomWorldType enum
         /// </summary>
@@ -657,5 +668,6 @@ namespace Refsa.CustomWorld.Editor
 
             AssetDatabase.Refresh();
         }
+#endregion
     }
 }

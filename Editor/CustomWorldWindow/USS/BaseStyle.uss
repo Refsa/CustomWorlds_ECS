@@ -240,7 +240,6 @@
     /* border-color: transparent; */
     /* background-color: transparent; */
     /* background-color: rgba(255, 255, 255, 0.5); */
-    --toast-background-color: #192B35;
 }
 
 #ToastMessageText {
@@ -250,4 +249,10 @@
     font-size: 14px;
 
     /* color: transparent; */
+}
+
+:root {
+    --toast-container-background-color: #192B35;
+    --toast-container-border-color: #6F845D;
+    --toast-text-color: #F7EFCA;
 }
