@@ -108,8 +108,6 @@ namespace Refsa.CustomWorld.Editor
 			toastMessageViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
                 	(data.packagePath + "/CustomWorldWindow/UXML/ToastMessageView.uxml");
 
-			// AddNewToastMessage("Some Toast Message", ToastMessageStatus.Ok);
-
 			if (isBaseSetup)
 			{
 				var mainViewUxml = AssetDatabase.LoadAssetAtPath<VisualTreeAsset>
@@ -265,7 +263,9 @@ namespace Refsa.CustomWorld.Editor
 				this.StartCoroutine(RemoveElementAfter(element, easeOutTime * 1.1f))
 			);
 		}
+#endregion
 
+#region Coroutines
 		IEnumerator RunActionAfter(VisualElement element, float time, Action<VisualElement> action)
 		{
 			double startTime = EditorApplication.timeSinceStartup;
@@ -297,9 +297,8 @@ namespace Refsa.CustomWorld.Editor
 			rootVisualElement.Remove(element);
 			yield break;
 		}
-		
 #endregion
-
+		
 #region SETUP
         /// <summary>
         /// Sets up required data from a fresh window
@@ -447,7 +446,7 @@ namespace Refsa.CustomWorld.Editor
         {
             if (data.addNewWorldTypeEnum == null || data.addNewWorldTypeEnum == "") 
             {
-				feedbackMessage = "New World Type name is empty";
+				feedbackMessage = "New World Type name is empty!";
                 return false;
             }
 

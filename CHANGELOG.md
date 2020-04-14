@@ -18,6 +18,11 @@ of Editor UIElements
     - Feedback for removing worlds
     - Feedback for changing system world type
 
+### Changes
+- Cleaned up USS style for editor window
+- Added in using vars to centralize the theming of the editor window
+- Toast messages will now wrap instead of overflowing the containing box
+
 ## 1.2.3
 ### Added
 - Window can now be resized between (800, 600) and (1600, 1000)

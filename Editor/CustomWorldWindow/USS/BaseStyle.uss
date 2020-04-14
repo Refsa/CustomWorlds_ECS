@@ -24,47 +24,48 @@
     height: 10%;
 }
 
-#SimpleLabel {
+.SimpleLabel {
     width: 100%;
-    height: 25px;
-    background-color: #192b35;
-    align-items: center;
+    height: 30px;
+    background-color: var(--theme-secondary-color);
 
     border-bottom-width: 1px;
-    border-color: #6F845D;
-
-    flex-shrink: 0;
+    border-color: var(--theme-accent-color);
 }
 
-#SimpleLabel Label {
+.SimpleLabel Label {
+    height: 100%;
     font-size: 15px;
-    color: #F7EFCA;
+    color: var(--theme-text-color-light);
+    -unity-text-align: middle-center;
 }
 
 /* Title Bar */
 
 #TitleBar {
-    height: 30px;
+    height: 50px;
     width: auto;
-    background-color: #192B35;
+    background-color: var(--theme-tertiary-color);
     display: flex;
     align-items: center;
 
     border-bottom-width: 1px;
-    border-color: #6F845D;
+    border-color: var(--theme-accent-color);
 
     flex-shrink: 0;
 }
 
 #TitleBar Label {
+    height: 100%;
     font-size: 20px;
-    color: #F7EFCA;
+    color: var(--theme-text-color-light);
+    -unity-text-align: middle-center;
 }
 
 /* Main Container */
 
 #MainContainer {
-    background-color: #101c20;
+    background-color: var(--theme-tertiary-color);
     width: auto;
     height: 100%;
     display: flex;
@@ -74,12 +75,12 @@
 /* Left Container */
 
 #LeftContainer {
-    background-color: #101c20;
+    background-color: var(--theme-tertiary-color);
     width: 50%;
     height: 100%;
 
     border-right-width: 1px;
-    border-color: #6F845D;
+    border-color: var(--theme-accent-color);
 }
 
 #ExistingWorldsContainer {
@@ -89,44 +90,39 @@
     flex-shrink: 0;
 }
 
-#WorldTypeContainer {
-    display: inline;
-}
-
-#WorldTypeInnerContainer {
-    display: inline;
-}
-
 #WorldTypeContainerTitle { 
     display: flex;
     flex-direction: row;
-    height: 20px;
-    background-color: #192B35;
+    height: 30px;
+    background-color: var(--theme-secondary-color);
 
     border-bottom-width: 1px;
-    border-color: #6F845D;
-    flex-shrink: 0;
+    border-color: var(--theme-accent-color);
 }
 
-#WorldTypeContainerTitle Label {
-    color: #F7EFCA;
+#WorldTypeContainerTitle > .WorldName, #WorldTypeContainerTitle > .WorldClass {
+    -unity-text-align: middle-center;
 }
 
 .WorldName {
     width: 33%;
-    margin-left: 2px;
     border-right-width: 1px;
-    border-color: #F7EFCA;
-    color: #F7EFCA;
+    border-color: var(--theme-accent-color);
 }
 
 .WorldClass {
     width: 60%;
-    color: #F7EFCA;
+}
+
+.WorldClass, .WorldName {
+    color: var(--theme-text-color-light);
+    height: 100%;
+    -unity-text-align: middle-left;
 }
 
 .WorldRemove {
     width: 5%;
+    cursor: link;
 }
 
 #AddNewWorldContainer {
@@ -154,55 +150,61 @@
 
 #AddWorldContainer Button {
     width: 20%;
-}
-
-.WorldTypeView {
-    background-color: #274754;
-    display: flex;
-    flex-direction: row;
-
-    border-bottom-width: 1px;
-    border-color: #6F845D;
+    cursor: link;
 }
 
 /* Right Container */
 
 #RightContainer {
-    background-color: #101c20;
+    background-color: var(--theme-tertiary-color);
     width: 50%;
     height: 100%;
     display: flex;
 
     border-left-width: 1px;
-    border-color: #6F845D;
+    border-color: var(--theme-accent-color);
 }
 
 #SystemInfoTitle {
     display: flex;
     flex-direction: row;
-    height: 20px;
-    background-color: #192B35;
+    height: 30px;
+    background-color: var(--theme-secondary-color);
 
     border-bottom-width: 1px;
-    border-color: #6F845D;
+    border-color: var(--theme-accent-color);
 
     flex-shrink: 0;
 }
 
-.AlignTextCenter {
-    align-self: center;
+.WorldTypeView {
+    background-color: var(--theme-primary-color);
+    display: flex;
+    flex-direction: row;
+
+    border-bottom-width: 1px;
+    border-color: var(--theme-accent-color);
 }
 
 .WorldTypeEnum {
+    padding-right: 5px;
     width: 25%;
     border-right-width: 1px;
-    border-color: #F7EFCA;
-    color: #F7EFCA;
+    border-color: var(--theme-accent-color);
+    color: var(--theme-text-color-light);
 }
 
 .SystemName {
     width: 75%;
-    color: #F7EFCA;
+    color: var(--theme-text-color-light);
+}
+
+.WorldTypeEnum, .SystemName {
+    -unity-text-align: middle-left;
+}
+
+#SystemInfoTitle > .WorldTypeEnum, #SystemInfoTitle > .SystemName {
+    -unity-text-align: middle-center;
 }
 
 /* Toast Message */
@@ -227,32 +229,45 @@
     flex-direction: row;
 
     position: absolute;
+    
     min-width: auto;
     min-height: auto;
-
-    height: 30px;
-    width: 400px;
+    height: 50px;
+    width: 450px;
 
     border-width: 1px;
-    border-color: #6F845D;
-    background-color: #192B35;
-    
-    /* border-color: transparent; */
-    /* background-color: transparent; */
-    /* background-color: rgba(255, 255, 255, 0.5); */
+    border-color: var(--theme-accent-color);
+    background-color: var(--theme-secondary-color);
 }
 
 #ToastMessageText {
-    color: #F7EFCA;
-    align-self: center;
-    margin: auto auto;
+    color: var(--theme-text-color-light);
+    height: 100%;
+    width: 100%;
+    
     font-size: 14px;
-
-    /* color: transparent; */
+    white-space: normal;
+    
+    -unity-text-align: middle-center;
+    /* -unity-overflow-clipbox: content-box; */
 }
 
 :root {
-    --toast-container-background-color: #192B35;
-    --toast-container-border-color: #6F845D;
-    --toast-text-color: #F7EFCA;
+    --theme-text-color-light: #efefef;
+    --theme-text-color-dark: #CEC490;
+    --theme-accent-color: #6F845D;
+    --theme-primary-color: #274754;
+    --theme-secondary-color: #192B35;
+    --theme-tertiary-color: #101C20;
+
+    /* --theme-text-color-light: #efefef;
+    --theme-text-color-dark: #CEC490;
+    --theme-accent-color: #50677D;
+    --theme-primary-color: #57423F;
+    --theme-secondary-color: #3D3433;
+    --theme-tertiary-color: rgb(37, 32, 32); */
+
+    --toast-container-background-color: var(--theme-secondary-color);
+    --toast-container-border-color: var(--theme-accent-color);
+    --toast-text-color: var(--theme-text-color-light);
 }

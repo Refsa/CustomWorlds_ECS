@@ -17,17 +17,18 @@
     <engine:VisualElement name="LeftContainer">
 
         <engine:VisualElement name="AddNewWorldContainer">
-            <engine:VisualElement name="SimpleLabel">
+            <engine:VisualElement class="SimpleLabel">
                 <engine:Label text="Add New World" />
             </engine:VisualElement>
+
             <engine:VisualElement name="AddWorldContainer" >
                 <engine:TextField name="AddWorldNameInput" />
                 <engine:Button text="Add World" name="AddWorldSubmit" />
             </engine:VisualElement>
         </engine:VisualElement>
-        
+
         <engine:VisualElement name="ExistingWorldsContainer">
-            <engine:VisualElement name="SimpleLabel">
+            <engine:VisualElement class="SimpleLabel">
                 <engine:Label text="Existing Worlds" />
             </engine:VisualElement>
             <engine:VisualElement name="WorldTypeContainer">
@@ -47,7 +48,7 @@
 
     <engine:VisualElement name="RightContainer">
 
-        <engine:VisualElement name="SimpleLabel">
+        <engine:VisualElement class="SimpleLabel">
             <engine:Label text="Systems"/>
         </engine:VisualElement>
         
