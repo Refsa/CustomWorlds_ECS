@@ -7,6 +7,10 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.3.1
+### Fixed
+- Previous version broke flex-shrink on some elements in the editor window, this is now fixed
+
 ## 1.3.0
 ### Added
 - Added com.unity.editorcoroutines package to dependencies

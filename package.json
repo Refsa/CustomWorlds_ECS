@@ -1,6 +1,6 @@
 {
     "name": "com.refsa.customworld",
-    "version": "1.3.0",
+    "version": "1.3.1",
     "displayName": "ECS Custom Worlds",
     "description": "Create and setup custom worlds for the Unity ECS framework",
     "unity": "2019.3",
