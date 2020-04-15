@@ -7,6 +7,10 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 ### Added
 - 
 
+## 1.5.0
+### Changes
+- Updated Entities dependency from 0.8.0-preview.8 to 0.9.0-preview.6
+
 ## 1.4.0
 ### Added
 - When removing a world type from the editor window it will now check for existing systems
