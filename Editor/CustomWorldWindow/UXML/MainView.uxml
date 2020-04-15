@@ -63,6 +63,14 @@
                 <engine:ScrollView name="SystemInfoContainer">
                     <!-- <engine:Instance template="SystemInfoView"/> -->
                 </engine:ScrollView>
+
+                <engine:VisualElement name="SystemBatchSettings">
+                    <engine:VisualElement name="SystemBatchToggleContainer">
+                        <engine:Toggle name="BatchSystems" /> 
+                        <engine:Label text="Batch" />
+                    </engine:VisualElement>
+                    <engine:Button text="Run" name="RunSystemBatch" />
+                </engine:VisualElement>
             </engine:VisualElement>
 
         </engine:VisualElement>

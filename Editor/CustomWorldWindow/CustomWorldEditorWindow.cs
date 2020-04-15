@@ -25,6 +25,7 @@ namespace Refsa.CustomWorld.Editor
         public string name;
         public Type type;
         public Enum worldEnum;
+		public Enum newWorldEnum;
     }
 
     internal class CustomWorldWindowData
@@ -48,6 +49,8 @@ namespace Refsa.CustomWorld.Editor
         int index = -1;
         bool isBaseSetup = false;
 
+		bool systemsBatchToggleStatus = false;
+
         CustomWorldWindowData data;
 
         VisualTreeAsset worldTypeViewUxml;
@@ -60,6 +63,9 @@ namespace Refsa.CustomWorld.Editor
         VisualElement systemInfoContainer;
 
 		List<EditorCoroutine> activeCoroutines;
+
+		Queue<SystemData> updateSystemDataQueue;
+		int verifyCount = 0;
 
         public static void Create()
         {
@@ -74,6 +80,8 @@ namespace Refsa.CustomWorld.Editor
         private void OnEnable() 
         {
 			activeCoroutines = new List<EditorCoroutine>();
+			updateSystemDataQueue = new Queue<SystemData>();
+			verifyCount = 0;
 
             SetupData();
             SetupView();
@@ -140,6 +148,21 @@ namespace Refsa.CustomWorld.Editor
             	    AddNewSystemInfoView(system);
             	}
 
+				var batchSystemsToggle = rootVisualElement.Query("BatchSystems").First() as Toggle;
+				batchSystemsToggle.value = systemsBatchToggleStatus;
+				batchSystemsToggle.RegisterValueChangedCallback(s => {
+					systemsBatchToggleStatus = s.newValue;
+				});
+
+				(rootVisualElement.Query("RunSystemBatch").First() as Button).clicked += 
+					() => {
+						while (updateSystemDataQueue.Count > 0)
+						{
+							var sd = updateSystemDataQueue.Dequeue();
+                            ChangeSystem(sd, sd.worldEnum, sd.newWorldEnum);
+						}
+                    };
+
 				var addWorldTextInput = rootVisualElement.Query("AddWorldNameInput").First() as TextField;
 				(rootVisualElement.Query("AddWorldSubmit").First() as Button).clicked +=
 					() => {
@@ -189,7 +212,22 @@ namespace Refsa.CustomWorld.Editor
             var enumField = (newElement.Query(null, "WorldTypeEnum").First() as EnumField);
             enumField.value = systemData.worldEnum;
             enumField.RegisterValueChangedCallback(e => {
-                ChangeSystem(systemData, e.previousValue, e.newValue);
+				if (!systemsBatchToggleStatus)
+				{
+                	ChangeSystem(systemData, e.previousValue, e.newValue);
+				}
+				else
+				{
+					systemData.newWorldEnum = e.newValue;
+					if (updateSystemDataQueue.Any(sdq => sdq.name == systemData.name))
+					{		
+						updateSystemDataQueue.First(sdq => sdq.name == systemData.name).newWorldEnum = e.newValue;
+					}
+					else
+					{
+						updateSystemDataQueue.Enqueue(systemData);
+					}
+				}
             });
 
             systemInfoContainer.Add(newElement);
@@ -368,7 +406,8 @@ namespace Refsa.CustomWorld.Editor
                         {
                             name = relatedSystem.Name,
                             type = relatedSystem,
-                            worldEnum = enumValue
+                            worldEnum = enumValue,
+							newWorldEnum = enumValue
                         }
                     );
                 }
@@ -583,8 +622,6 @@ namespace Refsa.CustomWorld.Editor
             AssetDatabase.Refresh();
         }
 
-		int verifyCount = 0;
-
         /// <summary>
         /// Removes a world.
         /// 
@@ -592,6 +629,7 @@ namespace Refsa.CustomWorld.Editor
         /// </summary>
         void RemoveWorld()
         {
+			// Find relevant systems with the world tag
 			if (data.systemDatas.Find(e => e.worldEnum.ToString() == data.wantedWorldType) != null)
 			{
 				if (verifyCount == 0)
@@ -652,6 +690,12 @@ namespace Refsa.CustomWorld.Editor
             data.newWorldTemplate = newWorldContents;
         }
 
+		/// <summary>
+		/// Changes the world type tag on a system
+		/// </summary>
+		/// <param name="data">The SystemData to work on</param>
+		/// <param name="oldValue">The old value of the systems world tag</param>
+		/// <param name="newValue">The wanted world tag</param>
         void ChangeSystem(SystemData data, Enum oldValue, Enum newValue)
         {
             string filePath = CustomWorldsEditorHelpers.FindFileInProject(data.name + ".cs");

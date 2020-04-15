@@ -208,7 +208,6 @@ namespace Refsa.CustomWorld.Editor
             {
                 if (dir.Contains("com.refsa.customworld"))
                 {
-                    // currentPath = dir + "/Editor";
                     currentPath = "Packages/com.refsa.customworld/Editor";
                     foundPackagePath = true;
                     break;
@@ -217,8 +216,6 @@ namespace Refsa.CustomWorld.Editor
 
             if (!foundPackagePath)
             {
-                // currentPath = Application.dataPath + "/Scripts/ECS/CustomWorld/Editor";
-
                 currentPath = "Assets/Scripts/ECS/CustomWorld/Editor";
                 if (!Directory.Exists(Application.dataPath.Replace("Assets/", currentPath)))
                 {

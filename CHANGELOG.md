@@ -12,6 +12,9 @@ Follows versioning (SemVers) of https://docs.unity3d.com/Manual/upm-semver.html
 - When removing a world type from the editor window it will now check for existing systems
 with the world tag before removing it. Clicking the X button twice will remove the tags on relevant
 systems and then remove the world type.
+- Added the ability to turn on batching for changing world type on systems
+    - A toggle to turn it on/off
+    - Button to run the batch change
 
 ## 1.3.1
 ### Fixed

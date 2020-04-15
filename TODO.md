@@ -10,8 +10,10 @@ Editor:
     ☐ Rename World
         ☐ Recursively find all systems with the world type tag
     ☐ Add multiple world types to systems
-    ☐ Batching changing system world types
-    ☐ Checking if system exists with world tag before deleting world tag
+    Batching changing system world types
+    Checking if system exists with world tag before deleting world tag
+    ☐ Fix saving of certain elements in the editor window
+        Batch toggle status should be saved between script recompiles
 
 Runtime:
 
